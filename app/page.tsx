@@ -6,6 +6,7 @@ import Skills from "@/src/components/Skills/Skills";
 import Projects from "@/src/components/Projects/Projects";
 import Experience from "@/src/components/Experience/Experiance";
 import ContactMe from "@/src/components/ContactMe/ContactMe";
+import ScrollButton from "@/src/components/ScrollButton/ScrollButton";
 
 export default function Home() {
   return (
@@ -16,6 +17,7 @@ export default function Home() {
       <Projects />
       <Experience />
       <ContactMe />
+      <ScrollButton />
     </div>
   );
 }

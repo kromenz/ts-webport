@@ -8,6 +8,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand-purple: #9966CC;
   --font-mono: var(--font-fira-code);
   --font-sans: var(--font-inter);
 }
