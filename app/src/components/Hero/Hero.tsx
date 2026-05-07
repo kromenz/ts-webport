@@ -1,19 +1,21 @@
+import { StarfieldBackground } from "../../../../components/ui/starfield";
+
 const Hero = () => {
   return (
     <section
       id="hero"
-      className="min-h-screen flex items-center justify-center pt-16 pb-20">
-      <div className="container mx-auto px-4 text-center">
+      className="relative isolate min-h-screen flex items-center justify-center overflow-hidden pt-16 pb-20">
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <StarfieldBackground className="absolute! inset-0!" />
+      </div>
+      <div className="container relative z-10 mx-auto px-4 text-center">
         <h1 className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4">
           Rafael André
         </h1>
         <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
           Full Stack Developer
         </p>
-        <p className="text-lg max-w-2xl mx-auto text-gray-700 dark:text-gray-400 mb-12">
-          I build exceptional digital experiences that are fast, accessible, and
-          visually appealing.
-        </p>
+        <br />
         <div className="flex justify-center gap-4">
           <button
             onClick={() =>

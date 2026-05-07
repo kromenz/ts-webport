@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
-import { Fira_Code } from "next/font/google";
+import { Fira_Code, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { cn } from "@/lib/utils";
+
+const jetbrainsMono = JetBrains_Mono({subsets:['latin'],variable:'--font-mono'});
 
 const firaCode = Fira_Code({
   variable: "--font-fira-code",
@@ -21,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={cn("font-mono", jetbrainsMono.variable)}>
       <body
         suppressHydrationWarning
         className={`${firaCode.variable} antialiased`}>

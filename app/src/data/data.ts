@@ -168,7 +168,8 @@ export const PROJECTS = [
 
 export const WORK_EXPERIENCE = [
   {
-    title: "Waiter at Petiscas Restaurant (Summer Job)",
+    title: "Petiscas Restaurant",
+    position: "Waiter",
     date: "Jul 2022 - Sep 2022",
     responsibilities: [
       "Provided excellent customer service, ensuring quick and efficient service which resulted in positive feedback and increased customer satisfaction.",
@@ -181,7 +182,8 @@ export const WORK_EXPERIENCE = [
     ],
   },
   {
-    title: "BorgWarner (Summer Internship)",
+    title: "BorgWarner",
+    position: "Summer Internship",
     date: "Jul 2024 - Aug 2024",
     responsibilities: [
       "I began my internship at BorgWarner focusing on integrating Jasper with Python to generate various reports for the factory's production lines. My key responsibilities include:",
@@ -195,7 +197,8 @@ export const WORK_EXPERIENCE = [
     ],
   },
   {
-    title: "BorgWarner (Professional Internship)",
+    title: "BorgWarner",
+    position: "Software Developer Intern",
     date: "Sep 2024 - Jun 2025",
     responsibilities: [
       "I am continuing my internship at BorgWarner, focusing on the development of a new project, Maintenance Management System (MMS). This system streamlines all aspects of factory maintenance.",
@@ -211,6 +214,25 @@ export const WORK_EXPERIENCE = [
       "I also collaborate with the Digital Transformation team to identify the factory needs, refine system features, and ensure seamless integration with existing SAP workflows.",
 
       "My involvement in this MMS project demonstrates my ability to manage complex, multi-faceted initiatives in a demanding production environment.",
+    ],
+  },
+  {
+    title: "Worldover",
+    position: "Junior Backend Developer",
+    date: "Nov 2025 - Jun 2026",
+    responsibilities: [
+      "Worked on the document management system of a B2B compliance platform, focused on documentation, formulations, and regulatory workflows.",
+
+      "Main responsibilities and contributions included:",
+
+      [
+        "Document Generation: built customer-specific documents such as reports, dossiers, declarations, technical sheets, ingredient lists, and compliance documents, including DOCX, Excel and PDF exports.",
+        "Configurable Document System: contributed to a generic document engine with support for dynamic tables, metadata, headers/footers, logos, pagination, conditional fields, formatting, totals, and generation parameters.",
+        "Backend Development: worked with TypeScript, Node.js, tRPC, and Next.js, using AWS Neptune (graph database) and Gremlin to model and query complex relationships between documents, products, raw materials, formulations, batches, and lab tests.",
+        "Internal Tools: improved internal workflows for document creation, template configuration, status tracking, and visibility of client-specific document availability.",
+      ],
+
+      "Contributed to making the document system more automated, configurable, and scalable, enabling faster delivery of client-specific requirements and better internal document management.",
     ],
   },
 ];

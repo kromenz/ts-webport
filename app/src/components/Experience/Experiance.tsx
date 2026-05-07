@@ -12,9 +12,12 @@ const Experience = () => {
             <div key={index} className="mb-12 last:mb-0">
               <div className="flex flex-col md:flex-row md:items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-black dark:text-white">
-                  {experience.title}
+                  {experience.title} -{" "}
+                  <span className="text-gray-600 dark:text-gray-400">
+                    {experience.position}
+                  </span>
                 </h3>
-                <span className="text-gray-600 dark:text-gray-400 mt-1 md:mt-0">
+                <span className="text-gray-900 dark:text-gray-200 mt-1 md:mt-0">
                   {experience.date}
                 </span>
               </div>
