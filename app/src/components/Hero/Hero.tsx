@@ -9,10 +9,10 @@ const Hero = () => {
         <StarfieldBackground className="absolute! inset-0!" />
       </div>
       <div className="container relative z-10 mx-auto px-4 text-center">
-        <h1 className="text-4xl md:text-6xl font-bold text-black dark:text-white mb-4">
+        <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-sm">
           Rafael André
         </h1>
-        <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8">
+        <p className="text-xl md:text-2xl text-gray-400 mb-8">
           Full Stack Developer
         </p>
         <br />
@@ -23,7 +23,7 @@ const Hero = () => {
                 .getElementById("projects")
                 ?.scrollIntoView({ behavior: "smooth" })
             }
-            className="px-6 py-3 bg-black text-white dark:bg-white dark:text-black rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors">
+            className="rounded-lg bg-white px-6 py-3 font-medium text-zinc-950 shadow-sm ring-2 ring-transparent transition-[color,box-shadow,background-color] hover:bg-transparent hover:text-white hover:ring-white">
             View Projects
           </button>
           <button
@@ -32,7 +32,7 @@ const Hero = () => {
                 .getElementById("contact")
                 ?.scrollIntoView({ behavior: "smooth" })
             }
-            className="px-6 py-3 border border-black dark:border-white rounded-lg font-medium text-black dark:text-white hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">
+            className="rounded-lg border-2 border-white/90 bg-white/5 px-6 py-3 font-medium text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white hover:text-zinc-950">
             My CV
           </button>
         </div>

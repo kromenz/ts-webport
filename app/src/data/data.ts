@@ -1,73 +1,3 @@
-export const SKILLS = [
-  {
-    title: "Frontend",
-    icon: "/src/assets/images/frontend.png",
-    skills: [
-      { skill: "HTML5", percentage: "75%" },
-      { skill: "CSS3 (Sass/SCSS)", percentage: "60%" },
-      { skill: "Tailwind", percentage: "60%" },
-      { skill: "React.js", percentage: "50%" },
-    ],
-  },
-  {
-    title: "Backend",
-    icon: "/assets/images/backend.png",
-    skills: [
-      { skill: "Node.js", percentage: "50%" },
-      { skill: "Express.js", percentage: "30%" },
-    ],
-  },
-  {
-    title: "Databases",
-    icon: "/assets/images/db.png",
-    skills: [
-      { skill: "Postgres", percentage: "70%" },
-      { skill: "SQL Server", percentage: "80%" },
-      { skill: "Mongo DB", percentage: "30%" },
-      { skill: "Firebase", percentage: "50%" },
-      { skill: "Neo4J", percentage: "20%" },
-    ],
-  },
-  {
-    title: "Programming Languages",
-    icon: "/assets/images/coding.png",
-    skills: [
-      { skill: "Python", percentage: "50%" },
-      { skill: "C#", percentage: "30%" },
-      { skill: "C", percentage: "30%" },
-      { skill: "PHP", percentage: "30%" },
-      { skill: "Kotlin", percentage: "50%" },
-      { skill: "JAVA", percentage: "30%" },
-      { skill: "JavaScript", percentage: "50%" },
-      { skill: "Typescript", percentage: "30%" },
-    ],
-  },
-  {
-    title: "Tools",
-    icon: "/assets/images/tools.png",
-    skills: [
-      { skill: "Git & GitHub", percentage: "75%" },
-      { skill: "Visual Studio Code", percentage: "75%" },
-      { skill: "DBeaver", percentage: "70%" },
-      { skill: "Docker", percentage: "50%" },
-      { skill: "Postman", percentage: "50%" },
-      { skill: "Insomnia", percentage: "50%" },
-    ],
-  },
-  {
-    title: "Soft Skills",
-    icon: "/assets/images/soft-skills.png",
-    skills: [
-      { skill: "Problem-solving", percentage: "75%" },
-      { skill: "Teamwork", percentage: "80%" },
-      { skill: "Empathy", percentage: "80%" },
-      { skill: "Creative Thinking", percentage: "65%" },
-      { skill: "Organization", percentage: "90%" },
-      { skill: "Communication", percentage: "90%" },
-    ],
-  },
-];
-
 export const PROJECTS = [
   {
     title: "XML_Parsing - RPC_Server",
@@ -141,7 +71,7 @@ export const PROJECTS = [
     title: "Money Map",
     imageUrl: "/assets/images/moneymap.png",
     description:
-      "expense management application developed with React and Prisma, helping you monitor and organize your finances in a simple and intuitive way. ",
+      "Expense management application developed with React and Prisma, helping you monitor and organize your finances in a simple and intuitive way. ",
     githubUrl: "https://github.com/kromenz/Money-Map",
   },
   {

@@ -7,10 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-brand-purple: #9966CC;
-  --font-mono: var(--font-mono);
-  --font-sans: var(--font-inter);
-  --font-heading: var(--font-mono);
+  --color-green-primary: #34d399;
+  --font-mono: var(--font-fira-code);
+  --font-sans: var(--font-fira-code);
+  --font-heading: var(--font-fira-code);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -50,7 +50,7 @@
 }
 
 body {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-family: var(--font-fira-code), ui-monospace, monospace;
 }
 
 :root {
@@ -132,4 +132,41 @@ body {
   html {
     @apply font-mono;
   }
+}
+
+/* Hide scrollbar for mobile projects container */
+.scrollbar-hidden {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;             /* WebKit */
+}
+
+/* Projects section: infinite horizontal rows */
+@keyframes projects-marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes projects-marquee-right {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Marquee: animation is applied inline in React (reliable). Hover pause only. */
+.projects-marquee-track:hover {
+  animation-play-state: paused !important;
+}
+
+.projects-marquee-row-shell {
+  overflow: hidden;
 }
