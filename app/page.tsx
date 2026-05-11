@@ -12,8 +12,8 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-zinc-50 font-mono dark:bg-black">
       <Navbar />
       <Hero />
-      <Projects />
       <Experience />
+      <Projects />
       <ContactMe />
       <ScrollButton />
     </div>
