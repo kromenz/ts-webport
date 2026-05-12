@@ -49,8 +49,8 @@ const NavbarContent = () => {
   ];
 
   return (
-    <div className="flex md:grow md:justify-center">
-      <div className="hidden md:flex space-x-1">
+    <div className="flex lg:grow lg:justify-center">
+      <div className="hidden lg:flex space-x-1">
         {navItems.map((item) => (
           <motion.button
             key={item.id}
@@ -58,7 +58,7 @@ const NavbarContent = () => {
             className={`relative px-4 py-2 text-lg font-medium rounded-lg transition-colors ${
               activeSection === item.id
                 ? "text-green-primary"
-                : "text-gray-700 hover:text-green-primary dark:text-gray-300 dark:hover:text-green-primary"
+                : "text-slate-300 hover:text-green-primary"
             }`}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}>

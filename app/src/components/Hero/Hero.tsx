@@ -7,6 +7,7 @@ const Hero = () => {
       className="relative isolate min-h-screen flex items-center justify-center overflow-hidden pt-16 pb-20">
       <div className="absolute inset-0 z-0 overflow-hidden">
         <StarfieldBackground className="absolute! inset-0!" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-30 bg-linear-to-b from-transparent via-background/70 to-background" />
       </div>
       <div className="container relative z-10 mx-auto px-4 text-center">
         <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-sm">

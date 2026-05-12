@@ -9,7 +9,7 @@ import ScrollButton from "@/src/components/ScrollButton/ScrollButton";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-50 font-mono dark:bg-black">
+    <div className="flex min-h-screen flex-col bg-background text-foreground font-mono">
       <Navbar />
       <Hero />
       <Experience />

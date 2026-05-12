@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { GithubLogo, PlayCircle } from "@phosphor-icons/react";
 
 import { PROJECTS } from "@/src/data/data";
@@ -20,43 +20,15 @@ function useMarqueeMotionFactor() {
   return factor;
 }
 
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 1025); // Tailwind's md breakpoint is 1024px
-    };
-
-    // Check on mount
-    checkIsMobile();
-
-    // Update on resize with debounce to prevent excessive calls
-    let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
-    const handleResize = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(checkIsMobile, 100);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      clearTimeout(resizeTimeout);
-    };
-  }, []);
-
-  return isMobile;
-}
-
 type Project = (typeof PROJECTS)[number];
 
 function ProjectImagePlaceholder({ title }: { title: string }) {
   return (
     <div
-      className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-linear-to-br from-zinc-100 via-white to-cyan-50/40 dark:from-zinc-900 dark:via-zinc-950 dark:to-cyan-950/20"
+      className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-linear-to-br from-white/[0.03] via-transparent to-green-primary/5"
       aria-hidden>
       <svg
-        className="h-14 w-14 text-cyan-500/35 dark:text-cyan-400/25"
+        className="h-14 w-14 text-green-primary/30"
         viewBox="0 0 64 64"
         fill="none"
         xmlns="http://www.w3.org/2000/svg">
@@ -78,7 +50,7 @@ function ProjectImagePlaceholder({ title }: { title: string }) {
           strokeOpacity="0.35"
         />
       </svg>
-      <span className="max-w-[85%] truncate px-2 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
+      <span className="max-w-[85%] truncate px-2 text-center text-[10px] font-medium uppercase tracking-[0.2em] text-foreground/40">
         {title}
       </span>
     </div>
@@ -86,48 +58,81 @@ function ProjectImagePlaceholder({ title }: { title: string }) {
 }
 
 function ProjectCard({ project }: { project: Project }) {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    card.style.setProperty("--mx", `${e.clientX - rect.left}px`);
+    card.style.setProperty("--my", `${e.clientY - rect.top}px`);
+  };
+
   return (
-    <article className="group relative flex h-full w-[min(22rem,calc(100vw-2.5rem))] shrink-0">
-      <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-cyan-500/25 via-transparent to-violet-500/20 p-px dark:from-cyan-400/20 dark:to-violet-500/15">
-        <div className="h-full w-full rounded-2xl bg-zinc-50/90 dark:bg-zinc-950/90" />
+    <article
+      onMouseMove={handleMouseMove}
+      className="group relative flex h-full w-64 sm:w-72 lg:w-80 shrink-0">
+      <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-green-primary/20 via-transparent to-green-primary/5 p-px">
+        <div className="h-full w-full rounded-2xl bg-background/90" />
       </div>
 
-      <div className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/90 bg-white/75 shadow-sm transition-[border-color,box-shadow] duration-300 dark:border-white/10 dark:bg-zinc-900/55 dark:shadow-none md:group-hover:border-cyan-500/25 md:group-hover:shadow-[0_0_0_1px_rgba(6,182,212,0.12),0_20px_50px_-24px_rgba(0,0,0,0.35)] md:dark:group-hover:shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_24px_60px_-28px_rgba(0,0,0,0.65)]">
-        <div className="relative aspect-16/10 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800/80">
+      <div
+        ref={cardRef}
+        className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-none transition-[border-color,box-shadow] duration-300 md:group-hover:border-green-primary/30 md:group-hover:shadow-[0_0_0_1px_rgba(52,211,153,0.15),0_24px_60px_-28px_rgba(0,0,0,0.65)]">
+        <div
+          className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-300 md:group-hover:opacity-100"
+          style={{
+            background:
+              "radial-gradient(420px circle at var(--mx,50%) var(--my,50%), rgba(52,211,153,0.16), transparent 45%)",
+          }}
+          aria-hidden
+        />
+        <div className="relative aspect-video shrink-0 overflow-hidden bg-white/[0.04]">
           {project.imageUrl ? (
             <Image
               src={project.imageUrl}
               alt={`Preview for ${project.title}`}
               fill
-              sizes="360px"
+              sizes="(max-width: 640px) 16rem, (max-width: 1024px) 18rem, 20rem"
               className="object-cover motion-safe:md:group-hover:scale-[1.03] motion-reduce:md:group-hover:scale-100 motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-out"
             />
           ) : (
             <ProjectImagePlaceholder title={project.title} />
           )}
-          <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent opacity-0 transition-opacity duration-300 dark:from-black/40 md:group-hover:opacity-100" />
-          <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/35 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/90 dark:bg-black/45">
+          <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 md:group-hover:opacity-100" />
+          <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-white/15 bg-black/55 backdrop-blur-sm px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/90 font-mono">
             <span
-              className="h-1 w-1 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]"
+              className="h-1 w-1 rounded-full bg-green-primary shadow-[0_0_6px_rgba(52,211,153,0.9)]"
               aria-hidden
             />
-            build
+            {project.type}
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col p-5 md:p-6">
-          <h3 className="text-lg font-semibold leading-snug text-zinc-900 dark:text-white">
+        <div className="flex flex-1 flex-col p-4 sm:p-5 md:p-6">
+          <h3 className="text-lg font-semibold leading-snug text-foreground">
             {project.title}
           </h3>
-          <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-foreground/65">
             {project.description}
           </p>
-          <div className="mt-5 flex flex-wrap gap-2">
+          {project.tech && project.tech.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {project.tech.slice(0, 4).map((t) => (
+                <span
+                  key={t}
+                  className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[10px] font-mono text-foreground/70">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="mt-4 flex flex-wrap gap-2">
             <a
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/90 bg-zinc-50/80 px-3 py-1.5 text-xs font-medium text-zinc-800 transition-colors hover:border-cyan-500/40 hover:bg-cyan-50/50 hover:text-cyan-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 dark:hover:border-cyan-400/35 dark:hover:bg-cyan-950/30 dark:hover:text-cyan-100">
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-foreground/80 transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-green-primary font-mono">
               <GithubLogo
                 className="h-3.5 w-3.5 opacity-80"
                 aria-hidden
@@ -140,7 +145,7 @@ function ProjectCard({ project }: { project: Project }) {
                 href={project.videoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 rounded-full border border-zinc-200/90 bg-zinc-50/80 px-3 py-1.5 text-xs font-medium text-zinc-800 transition-colors hover:border-violet-500/35 hover:bg-violet-50/50 hover:text-violet-900 dark:border-white/10 dark:bg-white/5 dark:text-zinc-200 dark:hover:border-violet-400/35 dark:hover:bg-violet-950/25 dark:hover:text-violet-100">
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-foreground/80 transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-green-primary font-mono">
                 <PlayCircle
                   className="h-3.5 w-3.5 opacity-80"
                   aria-hidden
@@ -177,11 +182,11 @@ function MarqueeRow({
   return (
     <div className="projects-marquee-row-shell relative py-3">
       <div
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-linear-to-r from-zinc-50 to-transparent dark:from-black md:w-16"
+        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-linear-to-r from-background via-background/80 to-transparent md:w-32 lg:w-48"
         aria-hidden
       />
       <div
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-linear-to-l from-zinc-50 to-transparent dark:from-black md:w-16"
+        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l from-background via-background/80 to-transparent md:w-32 lg:w-48"
         aria-hidden
       />
       <div
@@ -206,7 +211,6 @@ function MarqueeRow({
 
 const Projects = () => {
   const motionFactor = useMarqueeMotionFactor();
-  const isMobile = useIsMobile();
   const mid = Math.ceil(PROJECTS.length / 2);
   const rowTop = PROJECTS.slice(0, mid);
   const rowBottom = PROJECTS.slice(mid);
@@ -214,18 +218,18 @@ const Projects = () => {
   return (
     <section
       id="projects"
-      className="relative overflow-hidden border-y border-zinc-200/80 bg-zinc-50 py-24 dark:border-white/5 dark:bg-black">
+      className="relative overflow-hidden py-24">
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.35] dark:opacity-[0.2]"
+        className="pointer-events-none absolute inset-0 opacity-[0.25]"
         aria-hidden>
-        <div className="absolute -left-1/4 top-0 h-[420px] w-[420px] rounded-full bg-cyan-400/20 blur-[50px] dark:bg-cyan-500/15" />
-        <div className="absolute -right-1/4 bottom-0 h-[380px] w-[380px] rounded-full bg-violet-500/15 blur-[50px] dark:bg-violet-500/10" />
+        <div className="absolute -left-1/4 top-0 h-[420px] w-[420px] rounded-full bg-green-primary/15 blur-[60px]" />
+        <div className="absolute -right-1/4 bottom-0 h-[380px] w-[380px] rounded-full bg-green-primary/10 blur-[60px]" />
         <div
-          className="absolute inset-0 dark:opacity-[0.12]"
+          className="absolute inset-0 opacity-[0.12]"
           style={{
             backgroundImage: `
-              linear-gradient(to right, rgb(24 24 27 / 0.06) 1px, transparent 1px),
-              linear-gradient(to bottom, rgb(24 24 27 / 0.06) 1px, transparent 1px)
+              linear-gradient(to right, rgb(255 255 255 / 0.06) 1px, transparent 1px),
+              linear-gradient(to bottom, rgb(255 255 255 / 0.06) 1px, transparent 1px)
             `,
             backgroundSize: "48px 48px",
           }}
@@ -234,45 +238,42 @@ const Projects = () => {
 
       <div className="container relative z-10 mx-auto px-4">
         <div className="mx-auto mb-12 max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white md:text-4xl">
-            Projects
+          <h2 className="text-center text-2xl md:text-3xl font-bold text-foreground/80 font-mono">
+            <span className="text-green-primary">{"~/"}</span>projects
           </h2>
         </div>
       </div>
 
-      {/* Mobile view: simple horizontal scroll */}
-      {isMobile && (
-        <div className="px-4 pb-10">
-          <div className="overflow-x-auto whitespace-nowrap py-8 scrollbar-hidden">
-            <div className="inline-flex items-center space-x-6">
-              {PROJECTS.map((project, index) => (
-                <ProjectCard
-                  key={`mobile-${project.title}-${index}`}
-                  project={project}
-                />
-              ))}
-            </div>
+      {/* Mobile / tablet: horizontal snap scroll with peek */}
+      <div className="lg:hidden">
+        <div className="overflow-x-auto py-6 scrollbar-hidden scroll-smooth snap-x snap-mandatory">
+          <div className="flex items-stretch gap-4 px-6 sm:px-10 md:px-16">
+            {PROJECTS.map((project, index) => (
+              <div
+                key={`mobile-${project.title}-${index}`}
+                className="snap-center first:ml-2 last:mr-2">
+                <ProjectCard project={project} />
+              </div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Desktop view: animated marquee rows */}
-      {!isMobile && (
-        <div className="relative left-1/2 z-10 w-screen max-w-[100vw] -translate-x-1/2 space-y-4 overflow-x-hidden">
-          <MarqueeRow
-            projects={rowTop}
-            direction="left"
-            durationSec={10}
-            motionFactor={motionFactor}
-          />
-          <MarqueeRow
-            projects={rowBottom.length > 0 ? rowBottom : rowTop}
-            direction="right"
-            durationSec={10}
-            motionFactor={motionFactor}
-          />
-        </div>
-      )}
+      {/* Desktop: animated marquee rows */}
+      <div className="hidden lg:block relative left-1/2 z-10 w-screen max-w-[100vw] -translate-x-1/2 space-y-4 overflow-x-hidden">
+        <MarqueeRow
+          projects={rowTop}
+          direction="left"
+          durationSec={40}
+          motionFactor={motionFactor}
+        />
+        <MarqueeRow
+          projects={rowBottom.length > 0 ? rowBottom : rowTop}
+          direction="right"
+          durationSec={40}
+          motionFactor={motionFactor}
+        />
+      </div>
     </section>
   );
 };
