@@ -162,9 +162,9 @@ body {
   }
 }
 
-/* Marquee: animation is applied inline in React (reliable). Hover slows the row to keep motion alive without blocking reading. */
+/* Marquee: animation is applied inline in React (reliable). Pause on hover so users can read without the row jumping (changing animation-duration mid-run causes a position jump). */
 .projects-marquee-track:hover {
-  animation-duration: 180s !important;
+  animation-play-state: paused;
 }
 
 .projects-marquee-row-shell {
