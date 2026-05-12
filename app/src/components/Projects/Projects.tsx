@@ -25,15 +25,24 @@ function useIsMobile() {
 
   useEffect(() => {
     const checkIsMobile = () => {
-      setIsMobile(window.innerWidth < 769); // Tailwind's md breakpoint is 768px
+      setIsMobile(window.innerWidth < 1025); // Tailwind's md breakpoint is 1024px
     };
 
     // Check on mount
     checkIsMobile();
 
-    // Update on resize
-    window.addEventListener("resize", checkIsMobile);
-    return () => window.removeEventListener("resize", checkIsMobile);
+    // Update on resize with debounce to prevent excessive calls
+    let resizeTimeout: ReturnType<typeof setTimeout> | undefined;
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(checkIsMobile, 100);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      clearTimeout(resizeTimeout);
+    };
   }, []);
 
   return isMobile;
@@ -83,7 +92,7 @@ function ProjectCard({ project }: { project: Project }) {
         <div className="h-full w-full rounded-2xl bg-zinc-50/90 dark:bg-zinc-950/90" />
       </div>
 
-      <div className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/90 bg-white/75 shadow-sm backdrop-blur-md transition-[border-color,box-shadow] duration-300 dark:border-white/10 dark:bg-zinc-900/55 dark:shadow-none md:group-hover:border-cyan-500/25 md:group-hover:shadow-[0_0_0_1px_rgba(6,182,212,0.12),0_20px_50px_-24px_rgba(0,0,0,0.35)] md:dark:group-hover:shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_24px_60px_-28px_rgba(0,0,0,0.65)]">
+      <div className="relative flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200/90 bg-white/75 shadow-sm transition-[border-color,box-shadow] duration-300 dark:border-white/10 dark:bg-zinc-900/55 dark:shadow-none md:group-hover:border-cyan-500/25 md:group-hover:shadow-[0_0_0_1px_rgba(6,182,212,0.12),0_20px_50px_-24px_rgba(0,0,0,0.35)] md:dark:group-hover:shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_24px_60px_-28px_rgba(0,0,0,0.65)]">
         <div className="relative aspect-16/10 shrink-0 overflow-hidden bg-zinc-100 dark:bg-zinc-800/80">
           {project.imageUrl ? (
             <Image
@@ -97,7 +106,7 @@ function ProjectCard({ project }: { project: Project }) {
             <ProjectImagePlaceholder title={project.title} />
           )}
           <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/25 via-transparent to-transparent opacity-0 transition-opacity duration-300 dark:from-black/40 md:group-hover:opacity-100" />
-          <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/35 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/90 backdrop-blur-sm dark:bg-black/45">
+          <div className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-white/20 bg-black/35 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-white/90 dark:bg-black/45">
             <span
               className="h-1 w-1 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(52,211,153,0.9)]"
               aria-hidden
@@ -209,8 +218,8 @@ const Projects = () => {
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.35] dark:opacity-[0.2]"
         aria-hidden>
-        <div className="absolute -left-1/4 top-0 h-[420px] w-[420px] rounded-full bg-cyan-400/20 blur-[100px] dark:bg-cyan-500/15" />
-        <div className="absolute -right-1/4 bottom-0 h-[380px] w-[380px] rounded-full bg-violet-500/15 blur-[100px] dark:bg-violet-500/10" />
+        <div className="absolute -left-1/4 top-0 h-[420px] w-[420px] rounded-full bg-cyan-400/20 blur-[50px] dark:bg-cyan-500/15" />
+        <div className="absolute -right-1/4 bottom-0 h-[380px] w-[380px] rounded-full bg-violet-500/15 blur-[50px] dark:bg-violet-500/10" />
         <div
           className="absolute inset-0 dark:opacity-[0.12]"
           style={{
