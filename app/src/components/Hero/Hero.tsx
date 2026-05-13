@@ -27,15 +27,14 @@ const Hero = () => {
             className="rounded-lg bg-white px-6 py-3 font-medium text-zinc-950 shadow-sm ring-2 ring-transparent transition-[color,box-shadow,background-color] hover:bg-transparent hover:text-white hover:ring-white">
             View Projects
           </button>
-          <button
-            onClick={() =>
-              document
-                .getElementById("contact")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
+          <a
+            href="/docs/Rafael_Andre.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Open Rafael André's CV in a new tab"
             className="rounded-lg border-2 border-white/90 bg-white/5 px-6 py-3 font-medium text-white backdrop-blur-sm transition-colors hover:border-white hover:bg-white hover:text-zinc-950">
             My CV
-          </button>
+          </a>
         </div>
       </div>
     </section>

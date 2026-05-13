@@ -14,31 +14,55 @@ const NavbarContent = () => {
     }
   };
 
-  // Track scroll position to highlight active section
   useEffect(() => {
-    const handleScroll = () => {
-      const sections = ["hero", "projects", "experience", "contact"];
-      const scrollPosition = window.scrollY + 100;
+    const sections = ["hero", "experience", "projects", "contact"];
 
+    const detectActiveSection = () => {
+      // Bottom-of-page override: when there's no room to scroll any further,
+      // force the last section. Short final sections can otherwise leave the
+      // detection point stuck inside the previous section.
+      const docHeight = Math.max(
+        document.documentElement.scrollHeight,
+        document.body.scrollHeight,
+      );
+      const scrolledToBottom =
+        window.innerHeight + window.scrollY >= docHeight - 2;
+      if (scrolledToBottom) {
+        setActiveSection(sections[sections.length - 1]);
+        return;
+      }
+
+      // Pick the last section whose top has been passed. Robust against
+      // mismatched section heights and avoids the previous "stuck in a
+      // range" failure mode.
+      const scrollPosition = window.scrollY + 120;
+      let current = sections[0];
       for (const section of sections) {
         const element = document.getElementById(section);
-        if (element) {
-          const offsetTop = element.offsetTop;
-          const height = element.offsetHeight;
-
-          if (
-            scrollPosition >= offsetTop &&
-            scrollPosition < offsetTop + height
-          ) {
-            setActiveSection(section);
-            break;
-          }
+        if (!element) continue;
+        if (element.offsetTop <= scrollPosition) {
+          current = section;
+        } else {
+          break;
         }
       }
+      setActiveSection(current);
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    detectActiveSection();
+
+    const handleLoad = () => detectActiveSection();
+    if (document.readyState === "complete") {
+      detectActiveSection();
+    } else {
+      window.addEventListener("load", handleLoad);
+    }
+
+    window.addEventListener("scroll", detectActiveSection, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", detectActiveSection);
+      window.removeEventListener("load", handleLoad);
+    };
   }, []);
 
   const navItems = [

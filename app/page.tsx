@@ -5,6 +5,7 @@ import Hero from "@/src/components/Hero/Hero";
 import Projects from "@/src/components/Projects/Projects";
 import Experience from "@/src/components/Experience/Experiance";
 import ContactMe from "@/src/components/ContactMe/ContactMe";
+import Footer from "@/src/components/Footer/Footer";
 import ScrollButton from "@/src/components/ScrollButton/ScrollButton";
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
       <Experience />
       <Projects />
       <ContactMe />
+      <Footer />
       <ScrollButton />
     </div>
   );

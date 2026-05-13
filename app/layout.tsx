@@ -16,9 +16,6 @@ const firaCode = Fira_Code({
 export const metadata: Metadata = {
   title: "Rafael André",
   description: "Rafael André's Web Portfolio",
-  icons: {
-    icon: "/favicon.ico",
-  },
 };
 
 export default function RootLayout({

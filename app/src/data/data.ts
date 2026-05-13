@@ -224,5 +224,11 @@ export const WORK_EXPERIENCE = [
       "PDF / DOCX / Excel Generation",
       "Document Engine Design",
     ],
+    attachments: [
+      {
+        name: "letter-of-recommendation.pdf",
+        url: "/docs/Rafael_Letter_of_Recommendation.pdf",
+      },
+    ],
   },
 ];
