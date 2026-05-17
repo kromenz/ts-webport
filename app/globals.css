@@ -228,31 +228,3 @@ body::-webkit-scrollbar-corner {
 .scrollbar-custom::-webkit-scrollbar-corner {
   background: transparent;
 }
-
-/* Projects section: infinite horizontal rows */
-@keyframes projects-marquee-left {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@keyframes projects-marquee-right {
-  from {
-    transform: translateX(-50%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-/* Marquee: animation is applied inline in React (reliable). Pause on hover so users can read without the row jumping (changing animation-duration mid-run causes a position jump). */
-.projects-marquee-track:hover {
-  animation-play-state: paused;
-}
-
-.projects-marquee-row-shell {
-  overflow: hidden;
-}

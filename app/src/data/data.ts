@@ -82,7 +82,7 @@ export const PROJECTS = [
     description:
       "In cooperation with Borgwarner, this project was degined to investigate applications that provided usefull insights in testing of web apps, in this case a Python web app. ",
     githubUrl: "https://github.com/diogoPinheiro11/borgwarner-test-app",
-    type: "Work",
+    type: "University",
     tech: ["Python", "Testing", "Web"],
   },
   {
