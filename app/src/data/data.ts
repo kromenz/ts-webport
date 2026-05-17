@@ -82,7 +82,7 @@ export const PROJECTS = [
     description:
       "In cooperation with Borgwarner, this project was degined to investigate applications that provided usefull insights in testing of web apps, in this case a Python web app. ",
     githubUrl: "https://github.com/diogoPinheiro11/borgwarner-test-app",
-    type: "Work",
+    type: "University",
     tech: ["Python", "Testing", "Web"],
   },
   {
@@ -200,18 +200,18 @@ export const WORK_EXPERIENCE = [
     position: "Junior Backend Developer",
     date: "Nov 2025 - Jun 2026",
     responsibilities: [
-      "Worked on the document management system of a B2B compliance platform, focused on documentation, formulations, and regulatory workflows.",
+      "Took full ownership of the reporting and document system of a B2B compliance platform — a complex, backend-heavy area of the codebase with tangled business logic, regulatory requirements, and customer-specific workflows around formulations, dossiers, and product compliance.",
 
-      "Main responsibilities and contributions included:",
+      "As a core member of a fast-moving startup team, owned a critical section of the platform, with customer requirements routed directly to me to be designed, scoped, and delivered end-to-end. Key contributions included:",
 
       [
         "Document Generation: built customer-specific documents such as reports, dossiers, declarations, technical sheets, ingredient lists, and compliance documents, including DOCX, Excel and PDF exports.",
-        "Configurable Document System: contributed to a generic document engine with support for dynamic tables, metadata, headers/footers, logos, pagination, conditional fields, formatting, totals, and generation parameters.",
-        "Backend Development: worked with TypeScript, Node.js, tRPC, and Next.js, using AWS Neptune (graph database) and Gremlin to model and query complex relationships between documents, products, raw materials, formulations, batches, and lab tests.",
-        "Internal Tools: improved internal workflows for document creation, template configuration, status tracking, and visibility of client-specific document availability.",
+        "Configurable Document Engine: designed and evolved a generic document engine with support for dynamic tables, metadata, headers/footers, logos, pagination, conditional fields, formatting, totals, and generation parameters — turning ad-hoc client requests into reusable, configurable building blocks.",
+        "Backend & Architecture: worked with TypeScript, Node.js, tRPC, and Next.js, using AWS Neptune (graph database) and Gremlin to model and query complex relationships between documents, products, raw materials, formulations, batches, and lab tests.",
+        "Internal Tools & Workflows: improved internal workflows for document creation, template configuration, status tracking, and visibility of client-specific document availability, directly shortening turnaround on customer requirements.",
       ],
 
-      "Contributed to making the document system more automated, configurable, and scalable, enabling faster delivery of client-specific requirements and better internal document management.",
+      "Also contributed to a significant company-wide transition to an AI-first, agentic approach, helping overhaul parts of the application and infrastructure — acting as both developer and architect on the document and reporting systems, and working closely with the team lead and stakeholders to translate business needs into scalable technical solutions.",
     ],
     skills: [
       "TypeScript",
@@ -223,6 +223,10 @@ export const WORK_EXPERIENCE = [
       "Graph Databases",
       "PDF / DOCX / Excel Generation",
       "Document Engine Design",
+      "System Ownership",
+      "Software Architecture",
+      "AI / Agentic Systems",
+      "Stakeholder Communication",
     ],
     attachments: [
       {
