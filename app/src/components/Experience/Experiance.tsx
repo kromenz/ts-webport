@@ -5,6 +5,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FilePdf, X, ArrowSquareOut } from "@phosphor-icons/react";
 import { WORK_EXPERIENCE } from "@/src/data/data";
+import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
 
 type Responsibility = string | string[];
 
@@ -36,11 +37,8 @@ const Experience = () => {
 
   return (
     <section id="experience" className="pt-24 pb-40 md:pb-48">
+      <SectionDivider command="cd ../work_experience" />
       <div className="container mx-auto px-4">
-        <h2 className="text-center text-2xl md:text-3xl font-bold text-foreground/80 mb-12 font-mono">
-          <span className="text-green-primary">{"~/"}</span>work-experience
-        </h2>
-
         <div className="max-w-7xl mx-auto rounded-2xl border border-white/10 bg-white/2 backdrop-blur-sm overflow-hidden shadow-xl shadow-black/20">
           {/* Window chrome */}
           <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/3">

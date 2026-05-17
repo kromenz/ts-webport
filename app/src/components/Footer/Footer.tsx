@@ -26,26 +26,26 @@ const Footer = () => {
         aria-hidden
       />
 
-      <div className="container mx-auto px-4 py-10 md:py-12">
+      <div className="container mx-auto px-4 py-5 md:py-6">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: false, amount: 0.3 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
-          className="grid gap-8 md:grid-cols-[1fr_auto] md:items-end">
+          className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
           <div className="font-mono">
-            <div className="flex items-center gap-2 text-green-primary/90 text-base mb-2">
+            <div className="flex items-center gap-2 text-green-primary/90 text-sm mb-1">
               <span className="select-none">$</span>
               <span>logout</span>
               <span
-                className="ml-0.5 inline-block h-4 w-1.5 animate-pulse bg-green-primary/70"
+                className="ml-0.5 inline-block h-3 w-1 animate-pulse bg-green-primary/70"
                 aria-hidden
               />
             </div>
-            <p className="text-sm text-foreground/60 leading-relaxed">
+            <p className="text-xs text-foreground/60 leading-relaxed">
               <span className="text-foreground/35">{"//"}</span> Crafted with{" "}
               <motion.span
-                className="inline-block align-[-3px]"
+                className="inline-block align-[-2px]"
                 animate={{ scale: [1, 1.18, 1] }}
                 transition={{
                   duration: 1.4,
@@ -54,7 +54,7 @@ const Footer = () => {
                   ease: "easeInOut",
                 }}>
                 <Heart
-                  className="h-3.5 w-3.5 text-green-primary"
+                  className="h-3 w-3 text-green-primary"
                   aria-hidden
                   weight="fill"
                 />
@@ -63,8 +63,8 @@ const Footer = () => {
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 md:items-end">
-            <ul className="flex flex-wrap gap-1.5">
+          <div className="flex flex-col gap-2 md:items-end">
+            <ul className="flex flex-wrap gap-1">
               {TECH.map((t, i) => (
                 <motion.li
                   key={t}
@@ -76,19 +76,19 @@ const Footer = () => {
                     ease: "easeOut",
                     delay: 0.15 + i * 0.06,
                   }}
-                  className="rounded-full border border-white/10 bg-white/3 px-2.5 py-1 text-[11px] font-mono text-foreground/70 transition-colors hover:border-green-primary/40 hover:text-green-primary">
+                  className="rounded-full border border-white/10 bg-white/3 px-2 py-0.5 text-[10px] font-mono text-foreground/70 transition-colors hover:border-green-primary/40 hover:text-green-primary">
                   {t}
                 </motion.li>
               ))}
             </ul>
-            <div className="flex items-center gap-3 font-mono text-sm">
+            <div className="flex items-center gap-2.5 font-mono text-xs">
               <a
                 href={REPO_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex items-center gap-1.5 text-foreground/65 transition-colors hover:text-green-primary">
+                className="group inline-flex items-center gap-1 text-foreground/65 transition-colors hover:text-green-primary">
                 <GithubLogo
-                  className="h-4 w-4 opacity-80 group-hover:opacity-100"
+                  className="h-3.5 w-3.5 opacity-80 group-hover:opacity-100"
                   aria-hidden
                   weight="duotone"
                 />
@@ -100,9 +100,9 @@ const Footer = () => {
               <button
                 type="button"
                 onClick={scrollToTop}
-                className="group inline-flex items-center gap-1.5 text-foreground/65 transition-colors hover:text-green-primary">
+                className="group inline-flex items-center gap-1 text-foreground/65 transition-colors hover:text-green-primary">
                 <ArrowUp
-                  className="h-4 w-4 opacity-80 group-hover:opacity-100 transition-transform group-hover:-translate-y-0.5"
+                  className="h-3.5 w-3.5 opacity-80 group-hover:opacity-100 transition-transform group-hover:-translate-y-0.5"
                   aria-hidden
                   weight="bold"
                 />
@@ -117,7 +117,7 @@ const Footer = () => {
           whileInView={{ opacity: 1 }}
           viewport={{ once: false, amount: 0.8 }}
           transition={{ duration: 0.6, delay: 0.4 }}
-          className="mt-10 text-center font-mono text-[13px] uppercase tracking-[0.3em] text-foreground/30"
+          className="mt-5 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/30"
           aria-hidden>
           // end of file
         </motion.p>

@@ -3,6 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import { Check, Copy, GithubLogo, LinkedinLogo } from "@phosphor-icons/react";
+import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
 
 const EMAIL = "andrerafael892@gmail.com";
 
@@ -63,16 +64,8 @@ const ContactMe = () => {
 
   return (
     <section id="contact" className="relative py-20 md:py-28">
+      <SectionDivider command="cd ../contacts" />
       <div className="container mx-auto px-4">
-        <motion.h2
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.6 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="text-center text-2xl md:text-3xl font-bold text-foreground/80 mb-12 font-mono">
-          <span className="text-green-primary">{"~/"}</span>contacts
-        </motion.h2>
-
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -169,11 +162,13 @@ const ContactMe = () => {
                 ))}
               </div>
             </div>
-            <pre
-              className="mt-10 select-none text-[8px] sm:text-[10px] leading-tight text-foreground/25 overflow-x-auto"
-              aria-hidden>
-              {SIGNATURE}
-            </pre>
+            <div className="mt-10 flex justify-center overflow-x-auto">
+              <pre
+                className="select-none text-[8px] sm:text-[10px] leading-tight text-foreground/25"
+                aria-hidden>
+                {SIGNATURE}
+              </pre>
+            </div>
           </div>
         </motion.div>
       </div>

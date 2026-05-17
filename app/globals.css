@@ -228,3 +228,88 @@ body::-webkit-scrollbar-corner {
 .scrollbar-custom::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+/* Hero typewriter cursor */
+@keyframes terminal-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.animate-terminal-blink {
+  animation: terminal-blink 1s steps(1) infinite;
+}
+
+/* Konami easter egg */
+@keyframes konami-rainbow {
+  0% {
+    filter: hue-rotate(0deg) saturate(1.4) brightness(1.1);
+  }
+  100% {
+    filter: hue-rotate(360deg) saturate(1.4) brightness(1.1);
+  }
+}
+@keyframes konami-flash {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.konami-rainbow {
+  animation: konami-rainbow 2.5s linear infinite;
+  position: relative;
+}
+.konami-rainbow::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    rgba(52, 211, 153, 0.6),
+    rgba(52, 211, 153, 0) 65%
+  );
+  animation: konami-flash 1.2s ease-out forwards;
+  mix-blend-mode: screen;
+}
+.konami-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  z-index: 300;
+  padding: 12px 22px;
+  border-radius: 9999px;
+  font-family: var(--font-fira-code), ui-monospace, monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: #34d399;
+  background: rgba(20, 20, 26, 0.92);
+  border: 1px solid rgba(52, 211, 153, 0.55);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 0 24px rgba(52, 211, 153, 0.45),
+    0 8px 30px rgba(0, 0, 0, 0.5);
+  transform: translateX(-50%);
+  animation: konami-toast-in 0.35s ease-out;
+}
+@keyframes konami-toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 16px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
