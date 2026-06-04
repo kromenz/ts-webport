@@ -12,6 +12,7 @@ import {
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EMAIL = "andrerafael892@gmail.com";
 const LINKEDIN_URL = "https://www.linkedin.com/in/rafael-andr%C3%A9/";
+const GITHUB_URL = "https://github.com/kromenz";
 
 type Stage =
   | "menu"
@@ -46,7 +47,8 @@ const WELCOME: Omit<Line, "id">[] = [
   { text: "", tone: "muted" },
   { text: "  [1] email     — send me a message directly", tone: "info" },
   { text: "  [2] linkedin  — open my profile in a new tab", tone: "info" },
-  { text: "  [3] copy      — copy my email to clipboard", tone: "info" },
+  { text: "  [3] github    — open my profile in a new tab", tone: "info" },
+  { text: "  [4] copy      — copy my email to clipboard", tone: "info" },
   { text: "", tone: "muted" },
   { text: "// type a number and press Enter", tone: "muted" },
 ];
@@ -70,25 +72,33 @@ const promptFor = (stage: Stage): string => {
   }
 };
 
-let lineId = 0;
-const nextId = () => ++lineId;
+const makeWelcome = (): Line[] => WELCOME.map((l, i) => ({ ...l, id: i + 1 }));
 
 const ContactTerminal = () => {
-  const [history, setHistory] = useState<Line[]>(() =>
-    WELCOME.map((l) => ({ ...l, id: nextId() })),
-  );
+  const [history, setHistory] = useState<Line[]>(() => makeWelcome());
   const [input, setInput] = useState("");
   const [stage, setStage] = useState<Stage>("menu");
   const [form, setForm] = useState({ from: "", subject: "", message: "" });
   const [busy, setBusy] = useState(false);
   const [hp, setHp] = useState("");
   const mountedAtRef = useRef(Date.now());
+  const counterRef = useRef(WELCOME.length);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const append = useCallback((lines: Omit<Line, "id">[]) => {
-    setHistory((prev) => [...prev, ...lines.map((l) => ({ ...l, id: nextId() }))]);
+    // Assign IDs OUTSIDE the updater so the updater stays pure (Strict Mode safe).
+    const withIds: Line[] = lines.map((l) => ({
+      ...l,
+      id: ++counterRef.current,
+    }));
+    setHistory((prev) => [...prev, ...withIds]);
+  }, []);
+
+  const resetHistory = useCallback(() => {
+    counterRef.current = WELCOME.length;
+    setHistory(makeWelcome());
   }, []);
 
   const appendUserEcho = useCallback(
@@ -117,7 +127,10 @@ const ContactTerminal = () => {
     append([
       { text: "", tone: "muted" },
       { text: "// back to menu", tone: "muted" },
-      { text: "  [1] email   [2] linkedin   [3] copy", tone: "info" },
+      {
+        text: "  [1] email   [2] linkedin   [3] github   [4] copy",
+        tone: "info",
+      },
     ]);
   }, [append]);
 
@@ -140,7 +153,14 @@ const ContactTerminal = () => {
         }
         return;
       }
-      if (choice === "3" || choice === "copy") {
+      if (choice === "3" || choice === "github") {
+        append([{ text: "opening github in a new tab... ✓", tone: "success" }]);
+        if (typeof window !== "undefined") {
+          window.open(GITHUB_URL, "_blank", "noopener,noreferrer");
+        }
+        return;
+      }
+      if (choice === "4" || choice === "copy") {
         if (typeof navigator !== "undefined" && navigator.clipboard) {
           navigator.clipboard
             .writeText(EMAIL)
@@ -161,30 +181,28 @@ const ContactTerminal = () => {
               ]),
             );
         } else {
-          append([
-            { text: "clipboard not available.", tone: "error" },
-          ]);
+          append([{ text: "clipboard not available.", tone: "error" }]);
         }
         return;
       }
       if (choice === "help" || choice === "?") {
         append([
-          { text: "commands: 1, 2, 3, help, :back, :clear", tone: "muted" },
+          { text: "commands: 1, 2, 3, 4, help, :back, :clear", tone: "muted" },
         ]);
         return;
       }
       if (choice === ":clear") {
-        setHistory(WELCOME.map((l) => ({ ...l, id: nextId() })));
+        resetHistory();
         return;
       }
       append([
         {
-          text: `unknown option: "${value}". type 1, 2 or 3.`,
+          text: `unknown option: "${value}". type 1, 2, 3 or 4.`,
           tone: "error",
         },
       ]);
     },
-    [append],
+    [append, resetHistory],
   );
 
   const showPreview = useCallback(
@@ -216,18 +234,38 @@ const ContactTerminal = () => {
             ts: mountedAtRef.current,
           }),
         });
-        const payload = (await res.json().catch(() => ({}))) as {
-          ok?: boolean;
-          error?: string;
-        };
+
+        const contentType = res.headers.get("content-type") ?? "";
+        let payload: { ok?: boolean; error?: string } = {};
+        let rawText = "";
+
+        if (contentType.includes("application/json")) {
+          try {
+            payload = (await res.json()) as typeof payload;
+          } catch {
+            rawText = await res.text().catch(() => "");
+          }
+        } else {
+          rawText = await res.text().catch(() => "");
+        }
+
         if (!res.ok || !payload.ok) {
+          const detail =
+            payload.error ??
+            (rawText
+              ? `HTTP ${res.status} · ${rawText.slice(0, 140)}`
+              : `HTTP ${res.status}`);
           append([
-            {
-              text: `✗ failed: ${payload.error ?? "unknown error"}`,
-              tone: "error",
-            },
+            { text: `✗ failed: ${detail}`, tone: "error" },
             { text: "type :back to try again.", tone: "muted" },
           ]);
+          if (typeof console !== "undefined") {
+            console.error("[contact] send failed", {
+              status: res.status,
+              payload,
+              rawText,
+            });
+          }
         } else {
           append([
             {
@@ -244,6 +282,9 @@ const ContactTerminal = () => {
           { text: `✗ failed: ${detail}`, tone: "error" },
           { text: "type :back to try again.", tone: "muted" },
         ]);
+        if (typeof console !== "undefined") {
+          console.error("[contact] fetch failed", err);
+        }
       } finally {
         setBusy(false);
         setStage("result");
@@ -276,7 +317,7 @@ const ContactTerminal = () => {
       return;
     }
     if (value === ":clear") {
-      setHistory(WELCOME.map((l) => ({ ...l, id: nextId() })));
+      resetHistory();
       return;
     }
 
@@ -286,9 +327,7 @@ const ContactTerminal = () => {
     }
     if (stageAtSubmit === "field-email") {
       if (!EMAIL_RE.test(value)) {
-        append([
-          { text: "✗ invalid email format. try again.", tone: "error" },
-        ]);
+        append([{ text: "✗ invalid email format. try again.", tone: "error" }]);
         return;
       }
       setForm((f) => ({ ...f, from: value }));
@@ -312,9 +351,7 @@ const ContactTerminal = () => {
     }
     if (stageAtSubmit === "field-message") {
       if (value.length < 5) {
-        append([
-          { text: "✗ message too short (min 5 chars).", tone: "error" },
-        ]);
+        append([{ text: "✗ message too short (min 5 chars).", tone: "error" }]);
         return;
       }
       if (value.length > 5000) {
@@ -351,7 +388,7 @@ const ContactTerminal = () => {
   const placeholder = useMemo(() => {
     switch (stage) {
       case "menu":
-        return "1, 2 or 3…";
+        return "1, 2, 3 or 4…";
       case "field-email":
         return "you@example.com";
       case "field-subject":
@@ -377,7 +414,7 @@ const ContactTerminal = () => {
         {history.map((line) => (
           <pre
             key={line.id}
-            className={`whitespace-pre-wrap break-words m-0 font-mono text-[13px] ${TONE_CLASS[line.tone]}`}>
+            className={`whitespace-pre-wrap wrap-break-word m-0 font-mono text-[13px] ${TONE_CLASS[line.tone]}`}>
             {line.text || " "}
           </pre>
         ))}

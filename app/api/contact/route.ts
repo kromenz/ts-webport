@@ -23,10 +23,7 @@ export async function POST(req: Request) {
     process.env.CONTACT_EMAIL_FROM ?? "Portfolio <onboarding@resend.dev>";
 
   if (!apiKey) {
-    return json(
-      { error: "Email is not configured on the server." },
-      503,
-    );
+    return json({ error: "Email is not configured on the server." }, 503);
   }
 
   let body: Payload;
@@ -37,10 +34,8 @@ export async function POST(req: Request) {
   }
 
   const from = typeof body.from === "string" ? body.from.trim() : "";
-  const subject =
-    typeof body.subject === "string" ? body.subject.trim() : "";
-  const message =
-    typeof body.message === "string" ? body.message.trim() : "";
+  const subject = typeof body.subject === "string" ? body.subject.trim() : "";
+  const message = typeof body.message === "string" ? body.message.trim() : "";
   const hp = typeof body.hp === "string" ? body.hp : "";
   const ts = typeof body.ts === "number" ? body.ts : 0;
 
@@ -69,11 +64,11 @@ export async function POST(req: Request) {
     message,
     "",
     "—",
-    "Sent from rafaelandre.dev terminal contact",
+    "Sent from portfolio terminal contact",
   ].join("\n");
 
   try {
-    const { error } = await resend.emails.send({
+    const result = await resend.emails.send({
       from: fromAddress,
       to,
       replyTo: from,
@@ -81,15 +76,21 @@ export async function POST(req: Request) {
       text,
     });
 
-    if (error) {
-      return json(
-        { error: error.message ?? "Failed to send email." },
-        502,
-      );
+    if (result.error) {
+      console.error("[contact] resend error", result.error);
+      const message =
+        result.error.message ??
+        (typeof result.error === "string"
+          ? result.error
+          : "Failed to send email.");
+      return json({ error: message }, 502);
     }
+
+    console.log("[contact] sent", { id: result.data?.id, to });
     return json({ ok: true }, 200);
   } catch (err) {
-    const detail = err instanceof Error ? err.message : "Unknown error.";
+    console.error("[contact] exception", err);
+    const detail = err instanceof Error ? err.message : "Unknown server error.";
     return json({ error: detail }, 500);
   }
 }
