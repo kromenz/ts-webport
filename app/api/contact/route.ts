@@ -78,12 +78,10 @@ export async function POST(req: Request) {
 
     if (result.error) {
       console.error("[contact] resend error", result.error);
-      const message =
-        result.error.message ??
-        (typeof result.error === "string"
-          ? result.error
-          : "Failed to send email.");
-      return json({ error: message }, 502);
+      return json(
+        { error: result.error.message ?? "Failed to send email." },
+        502,
+      );
     }
 
     console.log("[contact] sent", { id: result.data?.id, to });
