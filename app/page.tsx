@@ -10,10 +10,12 @@ import ScrollButton from "@/src/components/ScrollButton/ScrollButton";
 import ScrollProgress from "@/src/components/ScrollProgress/ScrollProgress";
 import ConsoleBanner from "@/src/components/EasterEggs/ConsoleBanner";
 import KonamiCode from "@/src/components/EasterEggs/KonamiCode";
+import { Analytics } from "@vercel/analytics/next";
 
 export default function Home() {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground font-mono">
+      <Analytics />
       <ScrollProgress />
       <ConsoleBanner />
       <KonamiCode />
