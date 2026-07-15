@@ -1,24 +1,9 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
-import { Check, Copy, GithubLogo, LinkedinLogo } from "@phosphor-icons/react";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
-
-const EMAIL = "andrerafael892@gmail.com";
-
-const SOCIALS = [
-  {
-    flag: "--linkedin",
-    href: "https://www.linkedin.com/in/rafael-andr%C3%A9/",
-    Icon: LinkedinLogo,
-  },
-  {
-    flag: "--github",
-    href: "https://github.com/kromenz",
-    Icon: GithubLogo,
-  },
-];
+import ContactTerminal from "./ContactTerminal";
 
 const SIGNATURE = [
   "  ____         __            _      _              _",
@@ -50,17 +35,6 @@ const ContactMe = () => {
     getTimeSnapshot,
     getServerTimeSnapshot,
   );
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(EMAIL);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      // Clipboard API can fail in insecure contexts; fall back silently.
-    }
-  };
 
   return (
     <section id="contact" className="relative py-20 md:py-28">
@@ -71,13 +45,13 @@ const ContactMe = () => {
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: false, amount: 0.25 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
-          className="max-w-2xl mx-auto rounded-2xl border border-white/10 bg-white/2 backdrop-blur-sm overflow-hidden shadow-xl shadow-black/20">
+          className="max-w-4xl mx-auto rounded-2xl border border-white/10 bg-white/2 backdrop-blur-sm overflow-hidden shadow-xl shadow-black/20">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/3">
             <span className="w-3 h-3 rounded-full bg-red-400/70" />
             <span className="w-3 h-3 rounded-full bg-yellow-400/70" />
             <span className="w-3 h-3 rounded-full bg-green-primary/80" />
             <span className="ml-3 text-xs text-foreground/50 font-mono truncate">
-              get-in-touch.sh
+              contact.sh
             </span>
           </div>
 
@@ -99,70 +73,14 @@ const ContactMe = () => {
               </span>
             </div>
 
-            <p className="text-foreground/75 leading-relaxed mb-8 text-sm md:text-base">
-              Currently open to new opportunities. Whether you have a question
-              or just want to say hi, I&apos;ll try my best to get back to you
-              as soon as possible.
+            <p className="text-foreground/75 leading-relaxed mb-6 text-sm md:text-base">
+              Currently open to new opportunities. Pick a channel below — I&apos;ll
+              get back to you as soon as I can.
             </p>
 
-            <div className="mb-6">
-              <div className="flex items-center gap-2 text-green-primary/90 text-sm mb-1">
-                <span className="select-none">$</span>
-                <span>echo $EMAIL</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="select-none text-green-primary/70" aria-hidden>
-                  ▹
-                </span>
-                <a
-                  href={`mailto:${EMAIL}`}
-                  className="text-foreground hover:text-green-primary transition-colors underline decoration-dotted underline-offset-4 hover:decoration-solid">
-                  {EMAIL}
-                </a>
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  aria-label={copied ? "Email copied" : "Copy email"}
-                  className="inline-flex items-center justify-center rounded-md p-1 text-foreground/50 transition-colors hover:bg-white/5 hover:text-foreground">
-                  {copied ? (
-                    <Check
-                      className="h-3.5 w-3.5 text-green-primary"
-                      aria-hidden
-                      weight="bold"
-                    />
-                  ) : (
-                    <Copy className="h-3.5 w-3.5" aria-hidden weight="bold" />
-                  )}
-                </button>
-                {copied && (
-                  <span className="text-xs text-green-primary/80">copied!</span>
-                )}
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2 text-green-primary/90 text-sm mb-2">
-                <span className="select-none">$</span>
-                <span>socials --</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {SOCIALS.map(({ flag, href, Icon }) => (
-                  <a
-                    key={flag}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/3 px-3 py-1.5 text-xs text-foreground/75 transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-green-primary">
-                    <Icon
-                      className="h-3.5 w-3.5 opacity-75 group-hover:opacity-100"
-                      aria-hidden
-                      weight="duotone"
-                    />
-                    <span>{flag}</span>
-                  </a>
-                ))}
-              </div>
-            </div>
-            <div className="mt-10 flex justify-center overflow-x-auto">
+            <ContactTerminal />
+
+            <div className="mt-8 flex justify-center overflow-x-auto">
               <pre
                 className="select-none text-[8px] sm:text-[10px] leading-tight text-foreground/25"
                 aria-hidden>
