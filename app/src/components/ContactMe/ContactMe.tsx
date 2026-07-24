@@ -66,16 +66,16 @@ const ContactMe = () => {
               <span className="text-foreground/30">·</span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="relative inline-flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-primary opacity-60" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-primary" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-400" />
                 </span>
-                <span className="text-green-primary/90">available</span>
+                <span className="text-amber-400/90">busy</span>
               </span>
             </div>
 
             <p className="text-foreground/75 leading-relaxed mb-6 text-sm md:text-base">
-              Currently open to new opportunities. Pick a channel below — I&apos;ll
-              get back to you as soon as I can.
+              Currently heads-down on a project. Still happy to hear from you —
+              I&apos;ll reply when I can.
             </p>
 
             <ContactTerminal />
