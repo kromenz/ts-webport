@@ -1,4 +1,33 @@
-export const PROJECTS = [
+export type Project = {
+  title: string;
+  imageUrl?: string;
+  description: string;
+  type: string;
+  tech?: string[];
+  githubUrl?: string;
+  videoUrl?: string;
+  liveUrl?: string;
+};
+
+export const PROJECTS: Project[] = [
+  {
+    title: "The Cusp — Website Creation & Hosting Platform",
+    description:
+      "A website creation and hosting platform. A customer signs up, picks a plan, and pays; everything after that is automatic. The platform provisions their GitHub repository, creates their Vercel project, publishes a branded \"under construction\" placeholder, and streams every step of the build back to them in real time until the site is live. I owned the backbone of that flow — schema design, authentication, payment integration, the customer dashboard, and the provisioning and deploy pipeline — along with the hosting lifecycle that suspends and restores sites as subscriptions change. The next phase layers AI site generation on top of the same infrastructure.",
+    type: "Work",
+    tech: [
+      "Next.js",
+      "TypeScript",
+      "Supabase (Postgres, RLS)",
+      "Stripe",
+      "GitHub API",
+      "Vercel API",
+      "Resend",
+      "Background Jobs / Queues",
+      "Webhooks",
+    ],
+    liveUrl: "https://thecusp.ai",
+  },
   {
     title: "XML_Parsing - RPC_Server",
     imageUrl: "/assets/images/xml.png",
@@ -233,6 +262,40 @@ export const WORK_EXPERIENCE = [
         name: "letter-of-recommendation.pdf",
         url: "/docs/Rafael_Letter_of_Recommendation.pdf",
       },
+    ],
+  },
+  {
+    title: "Alongside",
+    position: "Junior Fullstack Developer",
+    date: "Jul 2026 - Present",
+    responsibilities: [
+      "Contracted to RHY, working on The Cusp — a SaaS website creation and hosting platform. Built end to end: database schema, authentication, payments, and customer dashboard, using Next.js, TypeScript, Supabase, and Stripe.",
+
+      "Key contributions include:",
+
+      [
+        "Provisioning Pipeline: designed and shipped the automated pipeline that turns a payment into a live site — webhook-triggered idempotent jobs create the customer's GitHub repository and Vercel project, trigger and poll the deployment, and persist the result.",
+        "Subscription Lifecycle: implemented checkout, card on file, and a billing dashboard with plan and MRR summary, plus automatic site suspension when a subscription ends and automatic restore on reactivation.",
+        "Real-Time Build Events: built a customer-facing build-event system with a live progress timeline, isolated per tenant with row-level security.",
+        "Onboarding Flow: technical lead for the new-project onboarding flow, including self-serve custom-domain connection through the Vercel Domains API.",
+      ],
+
+      "The next phase of the platform layers AI site generation on top of the same infrastructure.",
+    ],
+    skills: [
+      "Next.js",
+      "TypeScript",
+      "Supabase",
+      "PostgreSQL / RLS",
+      "Stripe",
+      "GitHub API",
+      "Vercel API",
+      "Webhooks",
+      "Background Jobs",
+      "Database Schema Design",
+      "Authentication",
+      "SaaS Architecture",
+      "Technical Leadership",
     ],
   },
 ];

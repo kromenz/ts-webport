@@ -4,7 +4,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { GithubLogo, PlayCircle } from "@phosphor-icons/react";
+import { GithubLogo, PlayCircle, Globe } from "@phosphor-icons/react";
 
 import { PROJECTS } from "@/src/data/data";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
@@ -80,6 +80,9 @@ const Projects = () => {
   }, []);
 
   const activeSlug = slugify(active.title);
+  const hasLinks = Boolean(
+    active.githubUrl || active.liveUrl || active.videoUrl,
+  );
 
   return (
     <section id="projects" className="pt-24 pb-32 md:pb-40">
@@ -230,41 +233,60 @@ const Projects = () => {
                     </div>
                   )}
 
-                  <div className="mt-7 pt-5 border-t border-white/10">
-                    <p className="text-xs uppercase tracking-wider text-foreground/45 font-mono mb-3">
-                      // links
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      <a
-                        href={active.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`GitHub repository for ${active.title}`}
-                        className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/3 px-3 py-2 font-mono text-xs text-foreground/75 transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-foreground">
-                        <GithubLogo
-                          className="h-4 w-4 shrink-0 text-green-primary/70"
-                          aria-hidden
-                          weight="duotone"
-                        />
-                        <span className="truncate">GitHub</span>
-                      </a>
-                      {active.videoUrl ? (
-                        <a
-                          href={active.videoUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={`Demo video for ${active.title}`}
-                          className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/3 px-3 py-2 font-mono text-xs text-foreground/75 transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-foreground">
-                          <PlayCircle
-                            className="h-4 w-4 shrink-0 text-green-primary/70"
-                            aria-hidden
-                            weight="duotone"
-                          />
-                          <span className="truncate">Demo</span>
-                        </a>
-                      ) : null}
+                  {hasLinks && (
+                    <div className="mt-7 pt-5 border-t border-white/10">
+                      <p className="text-xs uppercase tracking-wider text-foreground/45 font-mono mb-3">
+                        // links
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {active.githubUrl ? (
+                          <a
+                            href={active.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`GitHub repository for ${active.title}`}
+                            className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/3 px-3 py-2 font-mono text-xs text-foreground/75 transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-foreground">
+                            <GithubLogo
+                              className="h-4 w-4 shrink-0 text-green-primary/70"
+                              aria-hidden
+                              weight="duotone"
+                            />
+                            <span className="truncate">GitHub</span>
+                          </a>
+                        ) : null}
+                        {active.liveUrl ? (
+                          <a
+                            href={active.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Live site for ${active.title}`}
+                            className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/3 px-3 py-2 font-mono text-xs text-foreground/75 transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-foreground">
+                            <Globe
+                              className="h-4 w-4 shrink-0 text-green-primary/70"
+                              aria-hidden
+                              weight="duotone"
+                            />
+                            <span className="truncate">Live site</span>
+                          </a>
+                        ) : null}
+                        {active.videoUrl ? (
+                          <a
+                            href={active.videoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Demo video for ${active.title}`}
+                            className="inline-flex items-center gap-2 rounded-md border border-white/10 bg-white/3 px-3 py-2 font-mono text-xs text-foreground/75 transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-foreground">
+                            <PlayCircle
+                              className="h-4 w-4 shrink-0 text-green-primary/70"
+                              aria-hidden
+                              weight="duotone"
+                            />
+                            <span className="truncate">Demo</span>
+                          </a>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>
