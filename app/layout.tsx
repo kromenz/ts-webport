@@ -1,16 +1,20 @@
 import type { Metadata } from "next";
-import { Fira_Code, JetBrains_Mono } from "next/font/google";
+import { Fira_Code, Geist } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
-const jetbrainsMono = JetBrains_Mono({
+// Sans carries body copy and headings; mono is reserved for the terminal
+// chrome (prompts, file names, pills, dates).
+const geist = Geist({
+  variable: "--font-geist",
   subsets: ["latin"],
-  variable: "--font-mono",
+  display: "swap",
 });
 
 const firaCode = Fira_Code({
   variable: "--font-fira-code",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const SITE_TITLE = "Rafael André — Full Stack Developer";
@@ -58,10 +62,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("font-mono", jetbrainsMono.variable)}>
-      <body
-        suppressHydrationWarning
-        className={`${firaCode.variable} antialiased`}>
+    <html
+      lang="en"
+      className={cn("font-sans", geist.variable, firaCode.variable)}>
+      <body suppressHydrationWarning className="antialiased">
         {children}
       </body>
     </html>

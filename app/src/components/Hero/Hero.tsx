@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { StarfieldBackground } from "../../../../components/ui/starfield";
+import { useSiteReducedMotion } from "@/src/lib/motion";
 
 const ROLES = [
   "Full Stack Developer",
@@ -17,9 +18,19 @@ const Hero = () => {
   const [phase, setPhase] = useState<"typing" | "holding" | "deleting">(
     "typing",
   );
+  const reduceMotion = useSiteReducedMotion();
 
   useEffect(() => {
     const current = ROLES[roleIndex];
+
+    // Reduced motion: print the role once and settle, no cycling. The state
+    // is filled rather than the render being branched, so the server and the
+    // first client render always agree on the text.
+    if (reduceMotion) {
+      if (typed === current) return;
+      const t = setTimeout(() => setTyped(current), 0);
+      return () => clearTimeout(t);
+    }
 
     if (phase === "typing") {
       if (typed.length < current.length) {
@@ -48,12 +59,12 @@ const Hero = () => {
       setRoleIndex((i) => (i + 1) % ROLES.length);
     }, 250);
     return () => clearTimeout(t);
-  }, [typed, phase, roleIndex]);
+  }, [typed, phase, roleIndex, reduceMotion]);
 
   return (
     <section
       id="hero"
-      className="relative isolate min-h-screen flex items-center justify-center overflow-hidden pt-16 pb-20">
+      className="relative isolate min-h-[100dvh] flex items-center justify-center overflow-hidden pt-16 pb-20">
       <div className="absolute inset-0 z-0 overflow-hidden">
         <StarfieldBackground className="absolute! inset-0!" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-30 bg-linear-to-b from-transparent via-background/70 to-background" />
@@ -72,7 +83,7 @@ const Hero = () => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-          className="text-4xl md:text-6xl font-bold text-white mb-4 drop-shadow-sm">
+          className="text-4xl md:text-6xl font-semibold tracking-tight text-white mb-4 drop-shadow-sm">
           Rafael André
         </motion.h1>
 
