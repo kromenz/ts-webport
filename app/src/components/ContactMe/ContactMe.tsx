@@ -3,6 +3,7 @@
 import { useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
+import SectionBackdrop from "@/src/components/SectionBackdrop/SectionBackdrop";
 import ContactTerminal from "./ContactTerminal";
 
 const SIGNATURE = [
@@ -37,15 +38,18 @@ const ContactMe = () => {
   );
 
   return (
-    <section id="contact" className="relative py-20 md:py-28">
+    <section
+      id="contact"
+      className="relative isolate overflow-hidden py-20 md:py-28">
+      <SectionBackdrop />
       <SectionDivider command="cd ../contacts" />
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: false, amount: 0.25 }}
+          viewport={{ once: true, amount: 0.25 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
-          className="max-w-4xl mx-auto rounded-2xl border border-white/10 bg-white/2 backdrop-blur-sm overflow-hidden shadow-xl shadow-black/20">
+          className="max-w-4xl mx-auto rounded-2xl border border-white/10 bg-[#17171e]/92 overflow-hidden shadow-xl shadow-black/20">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/3">
             <span className="w-3 h-3 rounded-full bg-red-400/70" />
             <span className="w-3 h-3 rounded-full bg-yellow-400/70" />
@@ -73,7 +77,7 @@ const ContactMe = () => {
               </span>
             </div>
 
-            <p className="text-foreground/75 leading-relaxed mb-6 text-sm md:text-base">
+            <p className="font-sans text-foreground/75 leading-relaxed mb-6 text-sm md:text-base">
               Currently heads-down on a project. Still happy to hear from you —
               I&apos;ll reply when I can.
             </p>

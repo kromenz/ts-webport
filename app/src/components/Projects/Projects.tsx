@@ -8,6 +8,7 @@ import { GithubLogo, PlayCircle, Globe } from "@phosphor-icons/react";
 
 import { PROJECTS } from "@/src/data/data";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
+import SectionBackdrop from "@/src/components/SectionBackdrop/SectionBackdrop";
 
 type Project = (typeof PROJECTS)[number];
 
@@ -85,7 +86,10 @@ const Projects = () => {
   );
 
   return (
-    <section id="projects" className="pt-24 pb-32 md:pb-40">
+    <section
+      id="projects"
+      className="relative isolate overflow-hidden pt-24 pb-32 md:pb-40">
+      <SectionBackdrop variant="graph" />
       <SectionDivider command="cd ../projects" />
       <div className="container mx-auto px-4">
         <motion.div
@@ -93,7 +97,7 @@ const Projects = () => {
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, amount: 0.15 }}
           transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: 0.05 }}
-          className="max-w-7xl mx-auto rounded-2xl border border-white/10 bg-white/2 backdrop-blur-sm overflow-hidden shadow-xl shadow-black/20">
+          className="max-w-7xl mx-auto rounded-2xl border border-white/10 bg-[#17171e]/92 overflow-hidden shadow-xl shadow-black/20">
           {/* Window chrome */}
           <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/3">
             <span className="w-3 h-3 rounded-full bg-red-400/70" />
@@ -201,12 +205,12 @@ const Projects = () => {
                   </div>
 
                   <div className="mt-6 flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 mb-1">
-                    <h3 className="text-xl font-bold text-foreground">
+                    <h3 className="text-xl font-semibold tracking-tight text-foreground">
                       {active.title}
                     </h3>
                   </div>
 
-                  <p className="mt-3 text-sm leading-relaxed text-foreground/75">
+                  <p className="mt-3 max-w-[68ch] text-[15px] leading-relaxed text-foreground/75">
                     {active.description}
                   </p>
 

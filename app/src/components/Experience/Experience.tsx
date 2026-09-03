@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FilePdf, X, ArrowSquareOut } from "@phosphor-icons/react";
 import { WORK_EXPERIENCE } from "@/src/data/data";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
+import SectionBackdrop from "@/src/components/SectionBackdrop/SectionBackdrop";
 
 type Responsibility = string | string[];
 
@@ -36,10 +37,13 @@ const Experience = () => {
   };
 
   return (
-    <section id="experience" className="pt-24 pb-40 md:pb-48">
+    <section
+      id="experience"
+      className="relative isolate overflow-hidden pt-24 pb-40 md:pb-48">
+      <SectionBackdrop />
       <SectionDivider command="cd ../work_experience" />
       <div className="container mx-auto px-4">
-        <div className="max-w-7xl mx-auto rounded-2xl border border-white/10 bg-white/2 backdrop-blur-sm overflow-hidden shadow-xl shadow-black/20">
+        <div className="max-w-7xl mx-auto rounded-2xl border border-white/10 bg-[#17171e]/92 overflow-hidden shadow-xl shadow-black/20">
           {/* Window chrome */}
           <div className="flex items-center gap-2 px-4 py-3 border-b border-white/10 bg-white/3">
             <span className="w-3 h-3 rounded-full bg-red-400/70" />
@@ -158,7 +162,7 @@ const Experience = () => {
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     className="p-6 md:p-8 md:absolute md:inset-0 md:overflow-y-auto scrollbar-custom">
                     <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 mb-1">
-                      <h3 className="text-xl font-bold text-foreground">
+                      <h3 className="text-xl font-semibold tracking-tight text-foreground">
                         {active.title}
                         <span className="text-foreground/55 font-normal">
                           {" "}
@@ -170,7 +174,7 @@ const Experience = () => {
                       </span>
                     </div>
 
-                    <div className="space-y-3 text-foreground/75 text-sm leading-relaxed mt-6">
+                    <div className="max-w-[68ch] space-y-3 text-foreground/75 text-[15px] leading-relaxed mt-6">
                       {active.responsibilities.map(
                         (responsibility, respIndex) =>
                           Array.isArray(responsibility) ? (

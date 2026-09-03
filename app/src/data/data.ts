@@ -11,9 +11,30 @@ export type Project = {
 
 export const PROJECTS: Project[] = [
   {
+    title: "Access OS — Deal-Sourcing Platform for Private Equity",
+    description:
+      "An internal deal-sourcing platform for a private equity firm, built solo. Access OS replaces four legacy applications with one system. Underneath sit two objective databases — Insights, normalized facts tied to geography, and Market Map, companies, locations and people. Above them sits a Research layer where each investment thesis declares its own Value and Edge, owns its scoring lenses, and produces Want-to-Own lists and POVs for the investment committee. Autonomous agents sweep the web for companies matching a thesis, behind a run state machine, budget ceilings, deduplication, and a human-review queue between agent proposal and database write.",
+    type: "Work",
+    tech: [
+      "Next.js 16 (App Router)",
+      "React",
+      "TypeScript",
+      "Prisma 7",
+      "PostgreSQL (Neon)",
+      "Tailwind",
+      "D3",
+      "Leaflet",
+      "Python 3.12",
+      "Anthropic SDK",
+      "Vercel",
+      "jose",
+      "bcrypt",
+    ],
+  },
+  {
     title: "The Cusp — Website Creation & Hosting Platform",
     description:
-      "A website creation and hosting platform. A customer signs up, picks a plan, and pays; everything after that is automatic. The platform provisions their GitHub repository, creates their Vercel project, publishes a branded \"under construction\" placeholder, and streams every step of the build back to them in real time until the site is live. I owned the backbone of that flow — schema design, authentication, payment integration, the customer dashboard, and the provisioning and deploy pipeline — along with the hosting lifecycle that suspends and restores sites as subscriptions change. The next phase layers AI site generation on top of the same infrastructure.",
+      "Turning a payment into a live, deployed website with zero manual steps. The Cusp is a website creation and hosting platform. A customer signs up, picks a plan, and pays; everything after that is automatic. The platform provisions their GitHub repository, creates their Vercel project, publishes a branded \"under construction\" placeholder, and streams every step of the build back to them in real time until the site is live. I owned the backbone of that flow — schema design, authentication, payment integration, the customer dashboard, and the provisioning and deploy pipeline — along with the hosting lifecycle that suspends and restores sites as subscriptions change.",
     type: "Work",
     tech: [
       "Next.js",
@@ -266,36 +287,50 @@ export const WORK_EXPERIENCE = [
   },
   {
     title: "Alongside",
-    position: "Junior Fullstack Developer",
-    date: "Jul 2026 - Present",
+    position: "Software Engineer",
+    date: "2026 - Present",
     responsibilities: [
-      "Contracted to RHY, working on The Cusp — a SaaS website creation and hosting platform. Built end to end: database schema, authentication, payments, and customer dashboard, using Next.js, TypeScript, Supabase, and Stripe.",
+      "Software engineer at Alongside, delivering client platforms through RHY Consulting. Two projects to date:",
 
-      "Key contributions include:",
+      "Access OS — Access Holdings, Jun 2026 to present. Sole engineer on an internal deal-sourcing platform for a private equity firm, built solo. It replaces four legacy applications with one system. Underneath sit two objective databases — Insights, normalized facts tied to geography, and Market Map, companies, locations and people. Above them sits a Research layer where each investment thesis declares its own Value and Edge, owns its scoring lenses, and produces Want-to-Own lists and POVs for the investment committee.",
 
       [
-        "Provisioning Pipeline: designed and shipped the automated pipeline that turns a payment into a live site — webhook-triggered idempotent jobs create the customer's GitHub repository and Vercel project, trigger and poll the deployment, and persist the result.",
-        "Subscription Lifecycle: implemented checkout, card on file, and a billing dashboard with plan and MRR summary, plus automatic site suspension when a subscription ends and automatic restore on reactivation.",
-        "Real-Time Build Events: built a customer-facing build-event system with a live progress timeline, isolated per tenant with row-level security.",
-        "Onboarding Flow: technical lead for the new-project onboarding flow, including self-serve custom-domain connection through the Vercel Domains API.",
+        "Agentic Discovery & Enrichment: autonomous agents sweep the web for companies matching a thesis. The hard part was the machinery around them — a run state machine, per-run scope freezing, budget ceilings, candidate-key deduplication, and a human-review queue between agent proposal and database write.",
+        "Neutral Broker for Paid Data: agents request a capability, never a vendor's endpoint. Credentials stay server-side, spend caps are code rather than instruction, and responses cache per company. Built before signing any vendor, so integrating one is writing a driver file instead of rewriting the system.",
+        "Geographic Scoring: scoring across 8.1 million county-level facts, with versioned methodologies and reproducible publishing — the same version always yields the same score. A sandboxed evaluator lets analysts write scoring expressions without arbitrary code execution.",
+        "Anti-Fabrication by Design: a blank field means \"not searched\", NOT_FOUND means \"searched and absent\", and every fact carries its source. Append-only evaluations, CI-validated external ingestion.",
+        "Authentication & Access Control: JWT sessions, bcrypt, role-based permissions, external guest provisioning, domain allowlists, and login auditing.",
       ],
 
-      "The next phase of the platform layers AI site generation on top of the same infrastructure.",
+      "The Cusp — RHY, 2026. Turning a payment into a live, deployed website with zero manual steps. A customer signs up, picks a plan, and pays; everything after that is automatic. The platform provisions their GitHub repository, creates their Vercel project, publishes a branded \"under construction\" placeholder, and streams every step of the build back to them in real time until the site is live. I owned the backbone of that flow — schema design, authentication, payment integration, the customer dashboard, and the provisioning and deploy pipeline — along with the hosting lifecycle that suspends and restores sites as subscriptions change.",
+
+      [
+        "Provisioning Pipeline: webhook-driven, idempotent provisioning — payment → repo creation → Vercel project → triggered deploy → polled to completion.",
+        "Subscription Lifecycle: Stripe Checkout, card on file, and a billing dashboard with plan and MRR summary, plus automatic site suspension and restore.",
+        "Build Events: a customer-facing build-event system with a real-time progress timeline, tenant-isolated with row-level security.",
+        "Custom Domains: self-serve custom-domain connection through the Vercel Domains API.",
+      ],
     ],
     skills: [
-      "Next.js",
+      "Next.js 16 (App Router)",
+      "React",
       "TypeScript",
-      "Supabase",
-      "PostgreSQL / RLS",
+      "Prisma 7",
+      "PostgreSQL (Neon)",
+      "Supabase (Postgres, RLS)",
+      "Tailwind",
+      "D3",
+      "Leaflet",
+      "Python 3.12",
+      "Anthropic SDK",
       "Stripe",
       "GitHub API",
       "Vercel API",
+      "Resend",
+      "Background Jobs / Queues",
       "Webhooks",
-      "Background Jobs",
-      "Database Schema Design",
-      "Authentication",
-      "SaaS Architecture",
-      "Technical Leadership",
+      "jose",
+      "bcrypt",
     ],
   },
 ];

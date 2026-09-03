@@ -19,7 +19,7 @@ const Footer = () => {
       <motion.div
         initial={{ scaleX: 0, opacity: 0 }}
         whileInView={{ scaleX: 1, opacity: 1 }}
-        viewport={{ once: false, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.4 }}
         transition={{ duration: 0.7, ease: "easeOut" }}
         style={{ transformOrigin: "center" }}
         className="pointer-events-none absolute -top-px left-0 right-0 h-px bg-linear-to-r from-transparent via-green-primary/50 to-transparent"
@@ -30,7 +30,7 @@ const Footer = () => {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.3 }}
+          viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.5, ease: "easeOut" }}
           className="grid gap-4 md:grid-cols-[1fr_auto] md:items-center">
           <div className="font-mono">
@@ -70,7 +70,7 @@ const Footer = () => {
                   key={t}
                   initial={{ opacity: 0, y: 6 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.5 }}
+                  viewport={{ once: true, amount: 0.5 }}
                   transition={{
                     duration: 0.35,
                     ease: "easeOut",
@@ -115,7 +115,7 @@ const Footer = () => {
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          viewport={{ once: false, amount: 0.8 }}
+          viewport={{ once: true, amount: 0.8 }}
           transition={{ duration: 0.6, delay: 0.4 }}
           className="mt-5 text-center font-mono text-[10px] uppercase tracking-[0.3em] text-foreground/30"
           aria-hidden>
