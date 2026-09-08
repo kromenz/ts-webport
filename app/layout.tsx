@@ -21,7 +21,19 @@ const SITE_TITLE = "Rafael André — Full Stack Developer";
 const SITE_DESCRIPTION =
   "Personal portfolio of Rafael André — a full stack developer building polished, terminal-flavored web experiences.";
 
+// Absolute base for the OG and Twitter image URLs. Without it Next falls back
+// to localhost and the social card breaks everywhere it is unfurled.
+// VERCEL_PROJECT_PRODUCTION_URL is the stable production domain, unlike
+// VERCEL_URL, which changes on every preview deployment.
+const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ??
+  (process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000");
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: {
     default: SITE_TITLE,
     template: "%s · Rafael André",
