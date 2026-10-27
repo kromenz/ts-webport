@@ -138,6 +138,14 @@ export default function Shell() {
         e.preventDefault();
         if (openRef.current) hide(true);
         else show();
+        return;
+      }
+      // Escape is handled here, not on the dialog, so it still closes after a
+      // click left focus on <body>.
+      if (e.key === "Escape" && openRef.current) {
+        e.preventDefault();
+        e.stopPropagation();
+        hide(true);
       }
     };
     const onOpen = () => show();
@@ -254,15 +262,9 @@ export default function Shell() {
     if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) sound.click();
   };
 
-  // Escape closes; Tab outside the input cycles inside the dialog. In the
-  // input Tab completes instead, so focus can never leave through it.
+  // Tab outside the input cycles inside the dialog. In the input Tab
+  // completes instead, so focus can never leave through it.
   const onDialogKey = (e: ReactKeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Escape") {
-      e.preventDefault();
-      e.stopPropagation();
-      hide(true);
-      return;
-    }
     // Shift+Tab from the input moves backwards natively.
     if (e.key !== "Tab" || e.target === inputRef.current) return;
     const items = Array.from(
@@ -293,11 +295,21 @@ export default function Shell() {
         role="dialog"
         aria-modal="true"
         aria-labelledby="shell-title"
+        tabIndex={-1}
         onKeyDown={onDialogKey}
+        onClick={(e) => {
+          // A click on chrome (title bar, padding) must not strand focus on
+          // the dialog or <body>; give it back to the prompt unless the user
+          // is selecting text or hit something interactive.
+          const t = e.target as HTMLElement;
+          if (t.closest("input,button,a,textarea,select")) return;
+          if (!window.getSelection()?.isCollapsed) return;
+          inputRef.current?.focus({ preventScroll: true });
+        }}
         initial={reduced ? false : { opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: reduced ? 0 : 0.14, ease: "easeOut" }}
-        className="flex w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-white/10 bg-background font-mono text-sm shadow-2xl shadow-black/60">
+        className="flex w-full max-w-2xl flex-col overflow-hidden rounded-lg outline-none border border-white/10 bg-background font-mono text-sm shadow-2xl shadow-black/60">
         <div className="flex items-center justify-between border-b border-white/10 bg-white/3 px-4 py-2">
           <h2
             id="shell-title"
