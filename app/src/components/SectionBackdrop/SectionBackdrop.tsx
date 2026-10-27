@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 
-import { tokenStream } from "@/src/lib/ascii/tokens";
+import { STACK_TOKENS } from "@/src/lib/ascii/tokens";
 import { siteReducedMotion } from "@/src/lib/motion";
 
 /** Fraction of the width, each side, that the texture is confined to. */
@@ -11,6 +11,8 @@ const BAND = 0.32;
 const STEP = 18;
 /** Falling glyphs per column, each with its own speed and start height. */
 const DROPS_PER_COLUMN = 2;
+/** Vertical advance between the characters of a stacked token. */
+const LINE_H = 13;
 /** Peak glyph opacity, at the outer edge of a band. */
 const GLYPH_ALPHA = 0.34;
 /** Per-frame wipe. Lower leaves a longer trail behind each glyph. */
@@ -32,10 +34,12 @@ type Glyph = {
   y: number;
   speed: number;
   alpha: number;
-  ch: string;
-  /** This drop's own stream of stack-token characters. */
-  next: () => string;
+  /** A whole stack token, drawn top to bottom so it reads as a word. */
+  tok: string;
 };
+
+const pickToken = () =>
+  STACK_TOKENS[Math.floor(Math.random() * STACK_TOKENS.length)];
 
 type Node = {
   x: number;
@@ -109,12 +113,16 @@ const SectionBackdrop = ({ variant = "glyph", className }: Props) => {
       ctx.font = '12px "Fira Code", ui-monospace, monospace';
       for (const glyph of glyphs) {
         ctx.fillStyle = `rgba(52, 211, 153, ${glyph.alpha.toFixed(3)})`;
-        ctx.fillText(glyph.ch, glyph.x, glyph.y);
+        const tok = glyph.tok;
+        for (let i = 0; i < tok.length; i++) {
+          ctx.fillText(tok[i], glyph.x, glyph.y + i * LINE_H);
+        }
         if (!advance) continue;
         glyph.y += glyph.speed;
-        if (Math.random() < 0.03) glyph.ch = glyph.next();
         if (glyph.y > height + 12) {
-          glyph.y = -12;
+          // A fresh token each lap, entering from above the band.
+          glyph.tok = pickToken();
+          glyph.y = -12 - glyph.tok.length * LINE_H;
           glyph.speed = 0.3 + Math.random() * 0.7;
         }
       }
@@ -210,14 +218,14 @@ const SectionBackdrop = ({ variant = "glyph", className }: Props) => {
         const column = (x: number) => {
           const alpha = GLYPH_ALPHA * nearness(x);
           for (let d = 0; d < DROPS_PER_COLUMN; d++) {
-            const next = tokenStream();
             glyphs.push({
               x,
-              y: Math.random() * height,
+              // Each drop owns its own slice of the height, so two tokens in
+              // one column start apart instead of on top of each other.
+              y: ((d + Math.random()) / DROPS_PER_COLUMN) * height,
               speed: 0.3 + Math.random() * 0.7,
               alpha,
-              ch: next(),
-              next,
+              tok: pickToken(),
             });
           }
         };
