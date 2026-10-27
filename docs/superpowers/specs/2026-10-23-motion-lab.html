@@ -1,0 +1,1559 @@
+<title>Motion Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Geist:wght@400;500;600;800&family=VT323&display=swap">
+<style>
+/* Layout: one long lab bench. Research summary up top, then demo cards grouped by
+   the portfolio section they would live in, a fixed picks bar at the bottom.
+   Single dark theme on purpose: it is the portfolio's own palette. */
+:root {
+  color-scheme: dark;
+  --bg: #14141a;
+  --stage: #0f1014;
+  --surface: #191a21;
+  --surface-2: #20222a;
+  --line: rgba(226, 232, 240, 0.09);
+  --line-strong: rgba(226, 232, 240, 0.18);
+  --fg: #e2e8f0;
+  --muted: #8f97a6;
+  --dim: #4a5160;
+  --accent: #34d399;
+  --accent-soft: rgba(52, 211, 153, 0.13);
+  --hash: #e5c07b;
+  --ref: #7dd3fc;
+  --egg: #f0abfc;
+  --warn: #fbbf24;
+  --mono: "Fira Code", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --retro: "VT323", "Fira Code", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 96px;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.wrap { max-width: 1180px; margin: 0 auto; }
+.mono { font-family: var(--mono); }
+
+/* ---------- top ---------- */
+.top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: center;
+  padding-block: 56px 40px;
+}
+.eyebrow { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.eyebrow b { color: var(--accent); font-weight: 500; }
+h1 {
+  font-family: var(--sans);
+  font-weight: 800;
+  font-size: clamp(44px, 7vw, 84px);
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  margin: 14px 0 18px;
+  text-wrap: balance;
+}
+h1 .cur { color: var(--accent); font-weight: 400; animation: blink 1.05s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.lede { color: var(--muted); max-width: 56ch; margin: 0 0 26px; font-size: 16px; }
+.lede strong { color: var(--fg); font-weight: 500; }
+.verdict { display: grid; gap: 0; border-top: 1px solid var(--line); max-width: 640px; }
+.verdict div { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.verdict dt { font-family: var(--mono); font-size: 12px; color: var(--muted); padding-top: 2px; letter-spacing: 0.02em; }
+.verdict dd { margin: 0; font-size: 14.5px; }
+.verdict dd em { font-style: normal; color: var(--accent); }
+
+.glyphgrid {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  aspect-ratio: 1;
+  max-width: 420px;
+  width: 100%;
+  justify-self: center;
+  font-family: var(--mono);
+  font-size: clamp(13px, 1.6vw, 19px);
+  user-select: none;
+  cursor: crosshair;
+}
+.glyphgrid span { display: grid; place-items: center; color: var(--dim); will-change: transform; }
+.gridcap { font-family: var(--mono); font-size: 12px; color: var(--muted); text-align: center; margin-top: 10px; }
+
+/* ---------- sections ---------- */
+section.group { padding-block: 44px 8px; }
+.group-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-bottom: 20px; }
+.group-head .cmt { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+.group-head h2 { font-size: 26px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+.group-head p { flex-basis: 100%; margin: 0; color: var(--muted); max-width: 70ch; }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 500px), 1fr)); gap: 20px; }
+
+.demo {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: border-color 0.2s;
+}
+.demo.picked { border-color: rgba(52, 211, 153, 0.55); }
+.bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px;
+  font-family: var(--mono); font-size: 12px; color: var(--muted);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+  min-width: 0;
+}
+.bar i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); flex: none; }
+.bar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-left: 4px; }
+.stage { position: relative; height: 270px; background: var(--stage); overflow: hidden; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.meta { padding: 16px 18px 18px; display: grid; gap: 10px; }
+.meta-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.meta h3 { margin: 0; font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+.meta p { margin: 0; color: var(--muted); font-size: 14.5px; }
+.facts { display: flex; flex-wrap: wrap; gap: 4px 18px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.facts b { color: var(--fg); font-weight: 400; }
+.tag { font-family: var(--mono); font-size: 11px; padding: 2px 8px; border-radius: 99px; border: 1px solid currentColor; letter-spacing: 0.03em; white-space: nowrap; }
+.tag.sig { color: var(--accent); background: var(--accent-soft); }
+.tag.hi { color: var(--fg); }
+.tag.egg { color: var(--egg); }
+.tag.care { color: var(--warn); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-top: 4px; font-size: 13.5px; }
+.btn {
+  font-family: var(--mono); font-size: 12.5px;
+  background: transparent; border: 1px solid var(--line-strong); border-radius: 6px;
+  padding: 6px 11px; cursor: pointer; transition: border-color 0.15s, background 0.15s;
+}
+.btn:hover { border-color: var(--accent); }
+.btn.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+.pick { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; cursor: pointer; font-family: var(--mono); font-size: 12.5px; user-select: none; }
+.pick input { appearance: none; width: 16px; height: 16px; border: 1px solid var(--line-strong); border-radius: 4px; margin: 0; display: grid; place-items: center; cursor: pointer; }
+.pick input:checked { background: var(--accent); border-color: var(--accent); }
+.pick input:checked::after { content: "✓"; color: var(--bg); font-size: 12px; line-height: 1; font-weight: 700; }
+.chips { position: absolute; z-index: 3; top: 10px; right: 10px; display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; max-width: calc(100% - 20px); }
+.chips .btn { background: rgba(15, 16, 20, 0.85); padding: 4px 9px; font-size: 11.5px; }
+.touch-note { position: absolute; left: 12px; bottom: 10px; z-index: 3; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+@media (hover: hover) and (pointer: fine) { .touch-note { display: none; } }
+
+/* boot */
+.boot { position: absolute; inset: 0; padding: 18px 20px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; }
+.boot pre { margin: 0; white-space: pre-wrap; color: var(--muted); }
+.boot .ok { color: var(--accent); }
+.boot .who { margin-top: 10px; }
+.boot .who .p { color: var(--muted); }
+.boot .who .name { font-family: var(--sans); font-size: 30px; font-weight: 800; letter-spacing: -0.03em; color: var(--fg); display: block; line-height: 1.2; }
+.boot .who .role { color: var(--accent); }
+
+/* scramble */
+.scr { position: absolute; inset: 0; display: grid; align-content: center; gap: 2px; padding: 0 24px; }
+.scr h4 { margin: 0; font-family: var(--mono); font-weight: 600; font-size: clamp(26px, 4.6vw, 40px); letter-spacing: -0.02em; white-space: nowrap; cursor: default; }
+.scr h4 .n { color: var(--accent); font-weight: 400; }
+.scr h4:nth-child(2) { color: var(--muted); }
+.scr h4:nth-child(3) { color: var(--dim); }
+
+/* split */
+.split { position: absolute; inset: 0; display: grid; align-content: center; padding: 18px 24px; }
+.split .ttl { font-family: var(--mono); font-size: 12px; color: var(--accent); margin-bottom: 10px; }
+#splitP span { display: inline-block; }
+.split p { margin: 0; font-size: 17px; line-height: 1.5; max-width: 52ch; }
+
+/* git log */
+.gitlog { position: absolute; inset: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+.gitlog .rows { position: relative; padding: 16px 16px 120px 64px; font-family: var(--mono); font-size: 12.5px; }
+.gitlog svg { position: absolute; left: 0; top: 0; width: 64px; overflow: visible; }
+.gitlog .row { padding: 9px 0; min-height: 58px; }
+.gitlog .row.lane1 { padding-left: 22px; }
+.gitlog .h { color: var(--hash); }
+.gitlog .ref { color: var(--ref); }
+.gitlog .msg { color: var(--fg); }
+.gitlog .sub { color: var(--muted); display: block; }
+.gitlog .date { color: var(--dim); display: block; }
+.scrollhint { position: absolute; right: 12px; bottom: 10px; font-family: var(--mono); font-size: 11px; color: var(--muted); pointer-events: none; z-index: 2; }
+
+/* npm */
+.npm { font-variant-ligatures: none; position: absolute; inset: 0; padding: 16px 20px; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; overflow: hidden; }
+.npm pre { margin: 0; white-space: pre; }
+.npm .plus { color: var(--accent); }
+.npm .dim { color: var(--muted); }
+.npm .warnc { color: var(--warn); }
+
+/* spotlight */
+.spots { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 18px; }
+.spot {
+  --mx: 50%; --my: 50%;
+  position: relative; border-radius: 10px; padding: 16px; border: 1px solid var(--line);
+  background: radial-gradient(260px circle at var(--mx) var(--my), rgba(52, 211, 153, 0.16), transparent 62%), var(--surface);
+  display: flex; flex-direction: column; gap: 8px; min-width: 0; overflow: hidden;
+}
+.spot::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: radial-gradient(180px circle at var(--mx) var(--my), rgba(52, 211, 153, 0.7), transparent 70%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.spot .k { font-family: var(--mono); font-size: 11px; color: var(--accent); }
+.spot h5 { margin: 0; font-size: 15px; font-weight: 600; line-height: 1.3; }
+.spot p { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.45; flex: 1; overflow: hidden; }
+.mag { align-self: flex-start; font-family: var(--mono); font-size: 12px; padding: 7px 12px; border-radius: 6px; background: var(--fg); color: var(--bg); border: 0; cursor: pointer; }
+
+/* circuit */
+.circuit { position: absolute; inset: 0; display: grid; place-items: center; padding: 10px; }
+.circuit svg { width: 100%; height: 100%; max-height: 250px; }
+#circ circle { transform-box: fill-box; transform-origin: center; }
+
+/* shell */
+.shell { font-variant-ligatures: none; position: absolute; inset: 0; display: flex; flex-direction: column; font-family: var(--mono); font-size: 12.5px; }
+.shell .out { flex: 1; overflow-y: auto; padding: 12px 16px 6px; white-space: pre-wrap; word-break: break-word; scrollbar-width: thin; line-height: 1.5; }
+.shell .ln { display: flex; align-items: center; gap: 8px; padding: 6px 16px 8px; border-top: 1px solid var(--line); }
+.shell .ps { color: var(--accent); white-space: nowrap; }
+.shell input { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; caret-color: var(--accent); }
+.shell .qs { display: flex; gap: 6px; padding: 0 16px 10px; flex-wrap: wrap; }
+.shell .qs button { font-family: var(--mono); font-size: 11px; padding: 3px 8px; border-radius: 99px; border: 1px solid var(--line-strong); background: transparent; cursor: pointer; color: var(--muted); }
+.shell .qs button:hover { color: var(--accent); border-color: var(--accent); }
+.c-acc { color: var(--accent); } .c-mut { color: var(--muted); } .c-ref { color: var(--ref); } .c-hash { color: var(--hash); } .c-err { color: #f87171; }
+.kbd { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line-strong); border-bottom-width: 2px; padding: 0 5px; border-radius: 4px; }
+
+/* caret cursor */
+.caretzone { position: absolute; inset: 0; padding: 22px 24px; font-family: var(--mono); font-size: 14px; line-height: 1.9; }
+@media (hover: hover) and (pointer: fine) { .caretzone, .caretzone * { cursor: none; } }
+.caretzone .line { display: block; width: fit-content; max-width: 100%; }
+.caretzone .line .c-mut { color: var(--muted); }
+.caretzone input { margin-top: 12px; width: min(100%, 300px); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; padding: 7px 10px; outline: none; }
+.caret { position: absolute; left: 0; top: 0; width: 10px; height: 20px; background: var(--accent); pointer-events: none; z-index: 4; mix-blend-mode: difference; border-radius: 1px; transition: width 0.12s, height 0.12s, border-radius 0.12s; animation: blink 1.05s steps(1) infinite; }
+.caret.beam { width: 2px; animation: none; }
+
+/* clear / glitch */
+.screen { position: absolute; inset: 0; padding: 18px 22px; font-family: var(--mono); font-size: 13px; line-height: 1.7; }
+.screen .ttl { font-family: var(--sans); font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin: 4px 0 8px; display: block; }
+.screen .l { display: block; }
+.screen.rgb { text-shadow: -2px 0 rgba(244, 114, 182, 0.85), 2px 0 rgba(125, 211, 252, 0.85); }
+
+/* crt */
+.crt-demo { position: absolute; inset: 0; padding: 22px 26px; font-family: var(--retro); font-size: 22px; line-height: 1.15; color: #6ef2b4; text-shadow: 0 0 6px rgba(52, 211, 153, 0.75), 0 0 18px rgba(52, 211, 153, 0.35); background: radial-gradient(ellipse at center, #0f1f19 0%, #08100d 75%); transform-origin: center; }
+.crt-demo pre { margin: 0; font: inherit; white-space: pre-wrap; }
+.scan { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.32) 0 1px, transparent 1px 3px); }
+.vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.65) 100%); }
+.flick { animation: flick 4s infinite; }
+@keyframes flick { 0%, 100% { opacity: 1; } 47% { opacity: 1; } 48% { opacity: 0.93; } 49% { opacity: 1; } 78% { opacity: 0.96; } }
+html.crt-on body { text-shadow: 0 0 5px rgba(52, 211, 153, 0.25); }
+#crtOverlay { position: fixed; inset: 0; pointer-events: none; z-index: 60; display: none; background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px), radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.55) 100%); }
+html.crt-on #crtOverlay { display: block; }
+
+/* sound */
+.snd { position: absolute; inset: 0; display: grid; align-content: center; gap: 14px; padding: 22px 26px; font-family: var(--mono); font-size: 13px; }
+.snd input { width: min(100%, 360px); background: var(--surface); border: 1px solid var(--line-strong); border-radius: 6px; padding: 9px 12px; outline: none; }
+.meter { display: flex; gap: 3px; align-items: flex-end; height: 26px; }
+.meter i { width: 6px; background: var(--accent); border-radius: 1px; height: 3px; opacity: 0.8; }
+
+/* directions */
+.dirs { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+.dir { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; min-width: 0; }
+.dir.picked { border-color: rgba(52, 211, 153, 0.55); }
+.mock { position: relative; height: 210px; overflow: hidden; }
+.mock.a { background: radial-gradient(ellipse at center, #0f1f19 0%, #070d0b 80%); color: #6ef2b4; font-family: var(--retro); font-size: 21px; line-height: 1.1; padding: 18px 20px; text-shadow: 0 0 6px rgba(52, 211, 153, 0.7); }
+.mock.a pre { margin: 0; font: inherit; }
+.mock.b { background: var(--stage); background-image: radial-gradient(rgba(226, 232, 240, 0.07) 1px, transparent 1px); background-size: 18px 18px; display: grid; align-content: center; justify-items: start; padding: 20px 22px; gap: 6px; }
+.mock.b .k { position: absolute; top: 12px; right: 12px; font-family: var(--mono); font-size: 11px; color: var(--muted); border: 1px solid var(--line-strong); border-radius: 6px; padding: 2px 8px; }
+.mock.b .w { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.mock.b .w b { color: var(--accent); font-weight: 400; }
+.mock.b .nm { font-size: 34px; font-weight: 800; letter-spacing: -0.035em; line-height: 1; }
+.mock.b .rl { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.mock.b .bt { display: flex; gap: 8px; margin-top: 8px; }
+.mock.b .bt span { font-size: 11.5px; padding: 5px 10px; border-radius: 6px; border: 1px solid var(--line-strong); }
+.mock.b .bt span:first-child { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.mock.c { background: var(--stage); }
+.mock.c .ov { position: absolute; inset: auto 0 0 0; padding: 16px 20px; background: linear-gradient(transparent, rgba(15, 16, 20, 0.95) 55%); }
+.mock.c .ov .nm { font-family: var(--mono); font-size: 22px; font-weight: 600; }
+.mock.c .ov .rl { font-family: var(--mono); font-size: 12px; color: var(--accent); }
+.dir .meta ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
+.dir .meta ul li::marker { color: var(--dim); }
+.dir .meta .pro::marker { color: var(--accent); }
+label.radio { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; font-family: var(--mono); font-size: 12.5px; }
+.radio input { appearance: none; width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--line-strong); margin: 0; cursor: pointer; }
+.radio input:checked { border: 5px solid var(--accent); }
+.combo { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; padding: 14px 18px; border: 1px dashed var(--line-strong); border-radius: 10px; }
+.combo.picked { border-color: var(--accent); border-style: solid; background: var(--accent-soft); }
+.combo p { margin: 0; color: var(--muted); font-size: 14px; flex: 1 1 320px; }
+
+/* picks bar */
+.picks {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+  background: rgba(20, 20, 26, 0.92);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line-strong);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.picks .in { max-width: 1180px; margin: 0 auto; display: flex; align-items: center; gap: 10px 16px; padding-block: 12px; flex-wrap: wrap; }
+.picks .count { font-family: var(--mono); font-size: 13px; }
+.picks .count b { color: var(--accent); font-weight: 500; }
+.picks .list { font-size: 13px; color: var(--muted); flex: 1 1 200px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.picks .btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); font-weight: 500; }
+.fallback { max-width: 1180px; margin: 0 auto 12px; }
+.fallback textarea { width: 100%; height: 120px; background: var(--surface); color: var(--fg); border: 1px solid var(--line-strong); border-radius: 6px; font-family: var(--mono); font-size: 12px; padding: 8px; }
+.toast { position: fixed; left: 50%; bottom: 76px; transform: translateX(-50%); z-index: 70; font-family: var(--mono); font-size: 12.5px; background: var(--accent); color: var(--bg); padding: 6px 12px; border-radius: 6px; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
+.toast.show { opacity: 1; }
+.notice { font-family: var(--mono); font-size: 12.5px; color: var(--warn); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 8px; padding: 10px 14px; margin-top: 16px; }
+
+footer { padding-block: 48px 8px; color: var(--muted); font-size: 13.5px; border-top: 1px solid var(--line); margin-top: 48px; }
+footer ul { margin: 8px 0 0; padding-left: 18px; display: grid; gap: 3px; }
+
+@media (max-width: 860px) {
+  .top { grid-template-columns: minmax(0, 1fr); padding-block: 36px 24px; gap: 28px; }
+  .glyphgrid { max-width: 320px; }
+}
+@media (max-width: 560px) {
+  .stage { height: 250px; }
+  .verdict div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .spots { grid-template-columns: minmax(0, 1fr); }
+  .spots .spot:nth-child(2) { display: none; }
+  .pick { margin-left: 0; }
+  .picks .list { display: none; }
+}
+</style>
+
+<div id="crtOverlay" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">~/ts-webport <b>$</b> motion-lab --all</div>
+      <h1><span id="title">Motion Lab</span><span class="cur" aria-hidden="true">_</span></h1>
+      <p class="lede">16 ideias de animação para o teu portfolio, todas a correr ao vivo com o teu verde, as tuas fontes e os teus dados. <strong>Experimenta cada uma, marca "quero isto" nas que gostares e escolhe uma direção no fim.</strong> O botão em baixo copia a lista para colares no chat.</p>
+      <dl class="verdict">
+        <div><dt>biblioteca</dt><dd>Manter o framer-motion e juntar <em>anime.js 4.5</em> (MIT), importando só os módulos usados: cerca de 15–26 KB.</dd></div>
+        <div><dt>direção</dt><dd>As pesquisas apontam para <em>B + C</em>: estrutura limpa de shell moderno, com um campo ASCII vivo como assinatura no hero. O CRT fica como easter egg.</dd></div>
+        <div><dt>evitar</dt><dd>Intro com mais de 1,5 s, matrix rain como fundo principal, site em que só se navega a escrever comandos, vários canvas a correr ao mesmo tempo.</dd></div>
+      </dl>
+      <div class="notice" id="rmNotice" hidden>O teu sistema pede menos movimento. As animações contínuas estão paradas: carrega em ↻ repetir para ver cada uma.</div>
+      <div class="notice" id="libNotice" hidden>O anime.js não carregou, por isso algumas demos não vão animar. Recarrega a página.</div>
+    </div>
+    <div>
+      <div class="glyphgrid" id="glyphgrid" role="img" aria-label="Grelha de 13 por 13 caracteres que ondula a partir do ponto clicado"></div>
+      <div class="gridcap">clica numa célula · stagger({ grid: [13, 13], from })</div>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <section class="group">
+    <div class="group-head">
+      <span class="cmt">// hero</span><h2>A primeira impressão</h2>
+      <p>O que aparece antes de qualquer scroll. Aqui escolhes a "assinatura" do site: a coisa de que as pessoas se vão lembrar.</p>
+    </div>
+    <div class="grid">
+
+      <article class="demo" data-id="ascii-field" data-name="Campo ASCII reativo ao cursor" data-where="Hero">
+        <div class="bar"><i></i><i></i><i></i><span>Hero/AsciiField.tsx</span></div>
+        <div class="stage"><canvas id="cvField" aria-label="Campo de caracteres que reage ao cursor"></canvas><span class="touch-note">toca para criar ondas</span></div>
+        <div class="meta">
+          <div class="meta-top"><h3>Campo ASCII reativo</h3><span class="tag sig">assinatura</span></div>
+          <p>Uma malha de caracteres <span class="mono">.:-=+*#%@</span> que fica mais densa perto do cursor. Cada clique solta uma onda. Substituiria o starfield como fundo do hero.</p>
+          <div class="facts"><span>onde: <b>Hero (fundo)</b></span><span>peso: <b>~0 KB, canvas</b></span></div>
+          <div class="actions"><button class="btn" data-replay="ascii-field">↻ onda</button><a href="https://play.ertdfgcvb.xyz/" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-ascii-field"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="ascii-logo" data-name="Iniciais RA em ASCII" data-where="Hero">
+        <div class="bar"><i></i><i></i><i></i><span>Hero/AsciiMonogram.tsx</span></div>
+        <div class="stage"><canvas id="cvLogo" aria-label="Iniciais RA desenhadas com caracteres"></canvas></div>
+        <div class="meta">
+          <div class="meta-top"><h3>Monograma em ASCII</h3><span class="tag sig">assinatura</span></div>
+          <p>As tuas iniciais desenhadas com caracteres, que se formam a partir de ruído e ondulam. Funcionaria igual com um retrato teu ou um logótipo.</p>
+          <div class="facts"><span>onde: <b>Hero ou About</b></span><span>peso: <b>~0 KB, canvas</b></span></div>
+          <div class="actions"><button class="btn" data-replay="ascii-logo">↻ formar</button><a href="https://tympanus.net/codrops/2024/11/13/creating-an-ascii-shader-using-ogl/" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-ascii-logo"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="glyph-stars" data-name="Starfield feito de glifos" data-where="Hero">
+        <div class="bar"><i></i><i></i><i></i><span>components/ui/starfield.tsx</span></div>
+        <div class="stage"><canvas id="cvStars" aria-label="Starfield desenhado com caracteres"></canvas></div>
+        <div class="meta">
+          <div class="meta-top"><h3>Starfield em glifos</h3><span class="tag hi">alto impacto</span></div>
+          <p>O teu starfield atual, mas cada estrela é um caractere que cresce de <span class="mono">.</span> até <span class="mono">#</span> à medida que se aproxima. O cursor desvia o centro. É a mudança mais pequena face ao que já tens.</p>
+          <div class="facts"><span>onde: <b>Hero (substitui o atual)</b></span><span>peso: <b>~0 KB, canvas</b></span></div>
+          <div class="actions"><button class="btn" data-replay="glyph-stars">↻ hiperespaço</button><label class="pick"><input type="checkbox" id="pick-glyph-stars"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="boot" data-name="Arranque tipo BIOS" data-where="Primeira visita">
+        <div class="bar"><i></i><i></i><i></i><span>Hero/BootSequence.tsx</span></div>
+        <div class="stage">
+          <div class="chips"><button class="btn" id="bootSkip">saltar ⏎</button></div>
+          <div class="boot" id="boot" aria-live="off"><pre id="bootLog"></pre><div class="who" id="bootWho"><span class="p">$ whoami</span><span class="name">Rafael André</span><span class="role">Software Engineer @ Alongside</span></div></div>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><h3>Arranque tipo BIOS</h3><span class="tag care">usar com cuidado</span></div>
+          <p>Linhas <span class="mono">[ OK ]</span> a passar em 1,3 s antes do hero. Só na primeira visita (sessionStorage) e com botão para saltar. Mais longo do que isto, os recrutadores fecham o separador.</p>
+          <div class="facts"><span>onde: <b>antes do Hero</b></span><span>peso: <b>timeline ~6 KB</b></span></div>
+          <div class="actions"><button class="btn" data-replay="boot">↻ arrancar</button><a href="https://github.com/Swordfish90/cool-retro-term" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-boot"> quero isto</label></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ TEXT ============ -->
+  <section class="group">
+    <div class="group-head">
+      <span class="cmt">// texto</span><h2>Títulos e parágrafos</h2>
+      <p>Pequenos efeitos que se repetem em todas as secções. Custam pouco e dão personalidade sem atrapalhar a leitura.</p>
+    </div>
+    <div class="grid">
+      <article class="demo" data-id="scramble" data-name="Títulos que se decifram" data-where="Todas as secções">
+        <div class="bar"><i></i><i></i><i></i><span>lib/useScramble.ts</span></div>
+        <div class="stage">
+          <div class="chips" id="scrSets" role="group" aria-label="Conjunto de caracteres">
+            <button class="btn on" data-set="a-zA-Z0-9!%#_">texto</button>
+            <button class="btn" data-set="blocks">blocos</button>
+            <button class="btn" data-set="braille">braille</button>
+            <button class="btn" data-set="01">binário</button>
+          </div>
+          <div class="scr" id="scr"><h4 aria-label="01 Experience">01 Experience</h4><h4 aria-label="02 Projects">02 Projects</h4><h4 aria-label="03 Contact">03 Contact</h4></div>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><h3>Títulos que se decifram</h3><span class="tag hi">alto impacto</span></div>
+          <p>Os títulos chegam como caracteres aleatórios e assentam no texto real quando entram no ecrã. Passa o rato por cima para repetir. Experimenta os conjuntos de caracteres no canto.</p>
+          <div class="facts"><span>onde: <b>títulos, navbar</b></span><span>peso: <b>scrambleText ~3 KB</b></span></div>
+          <div class="actions"><button class="btn" data-replay="scramble">↻ decifrar</button><a href="https://animejs.com/documentation/text/scrambletext" target="_blank" rel="noopener">docs ↗</a><label class="pick"><input type="checkbox" id="pick-scramble"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="split" data-name="Texto revelado palavra a palavra" data-where="Descrições">
+        <div class="bar"><i></i><i></i><i></i><span>Projects/ProjectDescription.tsx</span></div>
+        <div class="stage">
+          <div class="chips" id="splitModes" role="group" aria-label="Modo de revelação">
+            <button class="btn on" data-mode="words">palavras</button>
+            <button class="btn" data-mode="chars">letras</button>
+          </div>
+          <div class="split"><div class="ttl">Access OS · Work</div><p id="splitP">An internal deal-sourcing platform for a private equity firm, built solo. Access OS replaces four legacy applications with one system.</p></div>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><h3>Revelação por palavras ou letras</h3><span class="tag hi">alto impacto</span></div>
+          <p>As palavras sobem de dentro de uma máscara, ou as letras acendem em ordem aleatória a verde. O texto continua legível para leitores de ecrã.</p>
+          <div class="facts"><span>onde: <b>descrições de projetos</b></span><span>peso: <b>splitText ~7 KB</b></span></div>
+          <div class="actions"><button class="btn" data-replay="split">↻ revelar</button><a href="https://animejs.com/documentation/text/splittext" target="_blank" rel="noopener">docs ↗</a><label class="pick"><input type="checkbox" id="pick-split"> quero isto</label></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ SECTIONS ============ -->
+  <section class="group">
+    <div class="group-head">
+      <span class="cmt">// secções</span><h2>Experience, Skills e Projects</h2>
+      <p>Cada secção ganha uma metáfora de terminal própria, com os teus dados reais.</p>
+    </div>
+    <div class="grid">
+      <article class="demo" data-id="gitlog" data-name="Experiência como git log --graph" data-where="Experience">
+        <div class="bar"><i></i><i></i><i></i><span>$ git log --graph --oneline career</span></div>
+        <div class="stage"><div class="gitlog" id="gitlog" tabindex="0" aria-label="Experiência profissional em formato git log"><div class="rows" id="gitRows"><svg id="gitSvg" aria-hidden="true"></svg></div></div><span class="scrollhint">faz scroll ↓</span></div>
+        <div class="meta">
+          <div class="meta-top"><h3>Experiência como <span class="mono">git log</span></h3><span class="tag sig">assinatura</span></div>
+          <p>Cada emprego é um commit e os ramos desenham-se à medida que fazes scroll. O estágio de verão na BorgWarner é um ramo que volta ao main.</p>
+          <div class="facts"><span>onde: <b>Experience</b></span><span>peso: <b>svg + scroll ~6 KB</b></span></div>
+          <div class="actions"><button class="btn" data-replay="gitlog">↻ percorrer</button><a href="https://githistory.xyz/" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-gitlog"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="npm" data-name="Stack como npm install" data-where="Skills">
+        <div class="bar"><i></i><i></i><i></i><span>$ npm install rafael</span></div>
+        <div class="stage"><div class="npm" aria-live="off"><pre id="npmOut"></pre></div></div>
+        <div class="meta">
+          <div class="meta-top"><h3>Stack como <span class="mono">npm install</span></h3><span class="tag hi">alto impacto</span></div>
+          <p>A tua stack instala-se pacote a pacote, com spinner e barra de progresso, e termina em <span class="mono">found 0 vulnerabilities</span>. Evita percentagens de proficiência inventadas.</p>
+          <div class="facts"><span>onde: <b>Skills / About</b></span><span>peso: <b>~0 KB, só texto</b></span></div>
+          <div class="actions"><button class="btn" data-replay="npm">↻ instalar</button><label class="pick"><input type="checkbox" id="pick-npm"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="spotlight" data-name="Cards com spotlight e botão magnético" data-where="Projects">
+        <div class="bar"><i></i><i></i><i></i><span>Projects/ProjectCard.tsx</span></div>
+        <div class="stage">
+          <div class="spots" id="spots">
+            <div class="spot"><span class="k">work · solo</span><h5>Access OS</h5><p>Deal-sourcing platform for private equity. Replaces four legacy apps with one system, plus autonomous research agents.</p><button class="mag">view project →</button></div>
+            <div class="spot"><span class="k">work · thecusp.ai</span><h5>The Cusp</h5><p>Turning a payment into a live, deployed website with zero manual steps.</p><button class="mag">view project →</button></div>
+          </div>
+          <span class="touch-note">efeito de desktop</span>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><h3>Spotlight e botão magnético</h3><span class="tag hi">alto impacto</span></div>
+          <p>Um brilho verde segue o cursor por dentro do card e acende a borda. O botão é puxado para o cursor quando chegas perto.</p>
+          <div class="facts"><span>onde: <b>cards de projeto</b></span><span>peso: <b>animatable ~1 KB</b></span></div>
+          <div class="actions"><button class="btn" data-replay="spotlight">↻ varrer</button><a href="https://brittanychiang.com/" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-spotlight"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="circuit" data-name="Divisor em circuito SVG" data-where="Entre secções">
+        <div class="bar"><i></i><i></i><i></i><span>SectionDivider/Circuit.tsx</span></div>
+        <div class="stage"><div class="circuit"><svg id="circ" viewBox="0 0 600 220" aria-label="Pistas de circuito impresso a ligar a um chip"></svg></div></div>
+        <div class="meta">
+          <div class="meta-top"><h3>Divisor em circuito</h3><span class="tag sig">assinatura</span></div>
+          <p>Pistas de PCB que se desenham até um chip com o nome da secção, com pacotes de dados a correr nelas. É o efeito mais "animejs.com" de todos: <span class="mono">createDrawable</span> + <span class="mono">createMotionPath</span>.</p>
+          <div class="facts"><span>onde: <b>SectionDivider</b></span><span>peso: <b>svg ~2 KB</b></span></div>
+          <div class="actions"><button class="btn" data-replay="circuit">↻ desenhar</button><a href="https://animejs.com/" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-circuit"> quero isto</label></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ INTERACTION ============ -->
+  <section class="group">
+    <div class="group-head">
+      <span class="cmt">// interação</span><h2>Coisas para mexer</h2>
+      <p>Para quem gosta de explorar. Nenhuma destas é obrigatória para ver o conteúdo.</p>
+    </div>
+    <div class="grid">
+      <article class="demo" data-id="shell" data-name="Mini shell / paleta Ctrl+K" data-where="Navbar / overlay">
+        <div class="bar"><i></i><i></i><i></i><span>CommandPalette/Shell.tsx</span></div>
+        <div class="stage">
+          <div class="shell">
+            <div class="out" id="shOut" aria-live="polite"></div>
+            <div class="qs" id="shQs"><button>help</button><button>ls projects</button><button>cat about.txt</button><button>cat the-cusp</button><button>sudo hire-me</button></div>
+            <label class="ln"><span class="ps">rafael@portfolio:~$</span><input id="shIn" autocomplete="off" spellcheck="false" aria-label="Comando"></label>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><h3>Mini shell com <span class="kbd">Ctrl</span> <span class="kbd">K</span></h3><span class="tag hi">alto impacto</span></div>
+          <p>Escreve <span class="mono">help</span>, usa <span class="kbd">Tab</span> para completar e <span class="kbd">↑</span> para o histórico. Os botões por cima servem quem não quer escrever. No site abria por cima de tudo com <span class="kbd">Ctrl</span> <span class="kbd">K</span>.</p>
+          <div class="facts"><span>onde: <b>overlay global</b></span><span>peso: <b>~3 KB, React</b></span></div>
+          <div class="actions"><button class="btn" data-replay="shell">↻ demo</button><a href="https://github.com/satnaing/terminal-portfolio" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-shell"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="caret" data-name="Cursor em bloco" data-where="Site inteiro (desktop)">
+        <div class="bar"><i></i><i></i><i></i><span>Cursor/BlockCaret.tsx</span></div>
+        <div class="stage">
+          <div class="caretzone" id="caretZone">
+            <span class="line"><span class="c-mut">$</span> cat about.txt</span>
+            <span class="line">Builds platforms end to end:</span>
+            <span class="line">schema, auth, payments, deploys.</span>
+            <input id="caretInput" placeholder="aqui vira I-beam" aria-label="Campo de exemplo">
+            <div class="caret" id="caret" aria-hidden="true"></div>
+          </div>
+          <span class="touch-note">efeito de desktop · carrega em ↻</span>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><h3>Cursor em bloco <span class="mono">█</span></h3><span class="tag care">usar com cuidado</span></div>
+          <p>O rato vira o caret de um terminal: segue com atraso, cola-se à altura da linha de texto e afina para I-beam nos inputs. Só em desktop.</p>
+          <div class="facts"><span>onde: <b>global, desktop</b></span><span>peso: <b>animatable ~1 KB</b></span></div>
+          <div class="actions"><button class="btn" data-replay="caret">↻ percorrer</button><label class="pick"><input type="checkbox" id="pick-caret"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="transition" data-name="Transição clear / glitch" data-where="Entre secções / rotas">
+        <div class="bar"><i></i><i></i><i></i><span>lib/sectionTransition.ts</span></div>
+        <div class="stage">
+          <div class="chips"><button class="btn" id="trClear">clear →</button><button class="btn" id="trGlitch">glitch →</button></div>
+          <div class="screen" id="screen"></div>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><h3>Transição <span class="mono">clear</span> ou glitch</h3><span class="tag hi">alto impacto</span></div>
+          <p>Ao saltar de secção pela navbar, o conteúdo faz <span class="mono">clear</span> e a secção nova imprime linha a linha. A variante glitch corta o ecrã em fatias durante 280 ms.</p>
+          <div class="facts"><span>onde: <b>navegação</b></span><span>peso: <b>timeline ~6 KB</b></span></div>
+          <div class="actions"><button class="btn" data-replay="transition">↻ trocar</button><a href="https://tympanus.net/codrops/2017/12/21/css-glitch-effect/" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-transition"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="sound" data-name="Som de teclado" data-where="Toggle na navbar">
+        <div class="bar"><i></i><i></i><i></i><span>lib/sfx.ts</span></div>
+        <div class="stage">
+          <div class="snd">
+            <div><button class="btn" id="sndToggle" aria-pressed="false">som: desligado</button></div>
+            <input id="sndIn" placeholder="liga o som e escreve aqui…" autocomplete="off" aria-label="Campo para testar o som">
+            <div class="meter" id="meter" aria-hidden="true"></div>
+            <div class="c-mut" style="font-size:12px">Enter faz um bip. O mini shell também usa o som quando está ligado.</div>
+          </div>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><h3>Som de teclado</h3><span class="tag care">usar com cuidado</span></div>
+          <p>Cliques suaves ao escrever e um bip no Enter, gerados com WebAudio (sem ficheiros). Desligado por defeito e ligado só por botão, como no site do Josh Comeau.</p>
+          <div class="facts"><span>onde: <b>toggle na navbar</b></span><span>peso: <b>~1 KB</b></span></div>
+          <div class="actions"><button class="btn" data-replay="sound">↻ escrever sozinho</button><a href="https://www.joshwcomeau.com/" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-sound"> quero isto</label></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ============ EASTER EGGS ============ -->
+  <section class="group">
+    <div class="group-head">
+      <span class="cmt">// easter eggs</span><h2>Escondidos</h2>
+      <p>Coisas que seriam demais como padrão, mas ótimas como recompensa: Konami code, um comando no shell, a página 404.</p>
+    </div>
+    <div class="grid">
+      <article class="demo" data-id="crt" data-name="Modo CRT" data-where="Konami / theme crt">
+        <div class="bar"><i></i><i></i><i></i><span>EasterEggs/CrtMode.tsx</span></div>
+        <div class="stage">
+          <div class="chips"><button class="btn" id="crtPage">ligar na página toda</button></div>
+          <div class="crt-demo flick" id="crtScreen"><pre>RA-OS 1.0   640K OK
+READY.
+
+&gt; cat about.txt
+RAFAEL ANDRE
+SOFTWARE ENGINEER
+&gt; _</pre><div class="scan"></div><div class="vig"></div></div>
+        </div>
+        <div class="meta">
+          <div class="meta-top"><h3>Modo CRT</h3><span class="tag egg">easter egg</span></div>
+          <p>Scanlines, brilho de fósforo e vinheta. O ↻ faz o efeito de ligar um monitor antigo. Experimenta ligá-lo na página toda.</p>
+          <div class="facts"><span>onde: <b>Konami / <span class="mono">theme crt</span></b></span><span>peso: <b>~0 KB, CSS</b></span></div>
+          <div class="actions"><button class="btn" data-replay="crt">↻ ligar monitor</button><a href="https://www.shadcn.io/background/faulty-terminal" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-crt"> quero isto</label></div>
+        </div>
+      </article>
+
+      <article class="demo" data-id="rain" data-name="Chuva de tokens da stack" data-where="404 / Konami">
+        <div class="bar"><i></i><i></i><i></i><span>SystemMessage/TokenRain.tsx</span></div>
+        <div class="stage"><canvas id="cvRain" aria-label="Chuva de tokens de código"></canvas></div>
+        <div class="meta">
+          <div class="meta-top"><h3>Chuva de tokens</h3><span class="tag egg">easter egg</span></div>
+          <p>A chuva do Matrix, mas com a tua stack: <span class="mono">const</span>, <span class="mono">=&gt;</span>, <span class="mono">prisma</span>, <span class="mono">await</span>. Como fundo principal é cliché. Na 404 ou como recompensa funciona.</p>
+          <div class="facts"><span>onde: <b>404 / Konami</b></span><span>peso: <b>~0 KB, canvas</b></span></div>
+          <div class="actions"><button class="btn" data-replay="rain">↻ recomeçar</button><a href="https://github.com/Rezmason/matrix" target="_blank" rel="noopener">exemplo real ↗</a><label class="pick"><input type="checkbox" id="pick-rain"> quero isto</label></div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============ DIRECTIONS ============ -->
+  <section class="group" id="directions">
+    <div class="group-head">
+      <span class="cmt">// direção</span><h2>Para onde vai o site todo</h2>
+      <p>As demos acima são peças. Isto é o tom geral, que decide quanto de cada peça entra. Escolhe uma.</p>
+    </div>
+    <div class="dirs">
+      <article class="dir" data-dir="A">
+        <div class="mock a"><pre>RA-OS 1.0
+BOOTING........ OK
+
+&gt; cat about.txt
+RAFAEL ANDRE
+SOFTWARE ENGINEER
+&gt; ls projects_</pre><div class="scan"></div><div class="vig"></div></div>
+        <div class="meta">
+          <div class="meta-top"><h3>A · Retro CRT OS</h3></div>
+          <ul><li class="pro">O mais nostálgico e divertido; ninguém esquece.</li><li>O mais difícil de manter legível, e o mais perto do cliché.</li></ul>
+          <label class="radio"><input type="radio" name="dir" value="A" id="dir-A"> escolher A</label>
+        </div>
+      </article>
+      <article class="dir" data-dir="B">
+        <div class="mock b"><span class="k">⌘K</span><span class="w"><b>$</b> whoami</span><span class="nm">Rafael André</span><span class="rl">Software Engineer @ Alongside</span><span class="bt"><span>View Projects</span><span>My CV</span></span></div>
+        <div class="meta">
+          <div class="meta-top"><h3>B · Shell minimal</h3></div>
+          <ul><li class="pro">Limpo e profissional, como Warp, Vercel ou Raycast. Recrutadores leem tudo em 5 segundos.</li><li>Sozinho, arrisca parecer "mais um portfolio bonito".</li></ul>
+          <label class="radio"><input type="radio" name="dir" value="B" id="dir-B"> escolher B</label>
+        </div>
+      </article>
+      <article class="dir" data-dir="C">
+        <div class="mock c"><canvas id="cvMini" aria-label="Campo ASCII em miniatura"></canvas><div class="ov"><div class="nm">Rafael André</div><div class="rl">~/software-engineer</div></div></div>
+        <div class="meta">
+          <div class="meta-top"><h3>C · ASCII generativo</h3></div>
+          <ul><li class="pro">O mais único e o mais próximo do animejs.com. Mostra craft técnico.</li><li>Mais pesado para a placa gráfica; precisa de uma versão estática para telemóveis fracos.</li></ul>
+          <label class="radio"><input type="radio" name="dir" value="C" id="dir-C"> escolher C</label>
+        </div>
+      </article>
+    </div>
+    <div class="combo" id="combo">
+      <label class="radio"><input type="radio" name="dir" value="B + C" id="dir-BC"> escolher B + C</label>
+      <p>Recomendado pelas pesquisas: a estrutura de B para o conteúdo, o campo ASCII de C como assinatura no hero, e o CRT de A escondido no Konami code.</p>
+    </div>
+  </section>
+
+  <footer>
+    <div>Fontes principais da pesquisa:</div>
+    <ul>
+      <li><a href="https://animejs.com/documentation/" target="_blank" rel="noopener">anime.js 4.5 · documentação</a> (MIT, scrambleText e splitText desde 4.2–4.4)</li>
+      <li><a href="https://tympanus.net/codrops/2026/01/04/efecto-building-real-time-ascii-and-dithering-effects-with-webgl-shaders" target="_blank" rel="noopener">Codrops · ASCII e dithering em tempo real</a></li>
+      <li><a href="https://gsap.com/community/standard-license/" target="_blank" rel="noopener">GSAP · licença</a> (grátis mas não open source; a alternativa considerada)</li>
+      <li><a href="https://nextjs.org/docs/app/guides/view-transitions" target="_blank" rel="noopener">Next.js · View Transitions</a> (para as transições entre secções)</li>
+    </ul>
+  </footer>
+</div>
+
+<div class="picks" id="picks">
+  <div class="fallback" id="fallback" hidden><textarea id="fallbackText" readonly aria-label="Escolhas em texto"></textarea></div>
+  <div class="in">
+    <span class="count"><b id="pickCount">0</b> escolhidas · direção: <b id="pickDir">—</b></span>
+    <span class="list" id="pickList">Marca "quero isto" nas demos de que gostares.</span>
+    <button class="btn" id="clearPicks">limpar</button>
+    <button class="btn primary" id="copyPicks">copiar escolhas</button>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.umd.min.js"></script>
+<script>
+(() => {
+  "use strict";
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const A = window.anime;
+  if (!A) $("#libNotice").hidden = false;
+  const { animate, stagger, createTimeline, splitText, scrambleText, svg, createAnimatable } = A || {};
+
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduce) $("#rmNotice").hidden = false;
+  const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  const css = getComputedStyle(document.documentElement);
+  const C = {
+    accent: css.getPropertyValue("--accent").trim(),
+    fg: css.getPropertyValue("--fg").trim(),
+    dim: css.getPropertyValue("--dim").trim(),
+    muted: css.getPropertyValue("--muted").trim(),
+    stage: css.getPropertyValue("--stage").trim(),
+  };
+  const MONO = '"Fira Code", ui-monospace, Menlo, Consolas, monospace';
+  const SANS = '"Geist", ui-sans-serif, system-ui, sans-serif';
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  /* ---------- registry: replay buttons + run-once-when-visible ---------- */
+  const demos = {};
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-replay]");
+    if (b && demos[b.dataset.replay]) demos[b.dataset.replay]();
+  });
+  function onFirstView(el, fn) {
+    const io = new IntersectionObserver((ents) => {
+      if (ents[0].isIntersecting) { io.disconnect(); if (!reduce) fn(); }
+    }, { threshold: 0.45 });
+    io.observe(el);
+  }
+  // A run token lets a replay cancel the previous async sequence of the same demo.
+  function runner() {
+    let id = 0;
+    return { next: () => ++id, alive: (t) => t === id };
+  }
+
+  /* ---------- canvas loop: pauses off-screen, on hidden tabs, and under reduced motion ---------- */
+  function canvasLoop(canvas, draw, onResize) {
+    const ctx = canvas.getContext("2d");
+    const st = { w: 0, h: 0, t: 0, running: false, visible: false, forced: !reduce };
+    let raf = 0;
+    const t0 = performance.now();
+    function resize() {
+      const r = canvas.getBoundingClientRect();
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      st.w = r.width; st.h = r.height;
+      canvas.width = Math.max(1, Math.round(r.width * dpr));
+      canvas.height = Math.max(1, Math.round(r.height * dpr));
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      onResize && onResize(ctx, st.w, st.h);
+      if (!st.running) draw(ctx, st.w, st.h, st.t, 0);
+    }
+    let last = t0;
+    function frame(now) {
+      if (!st.running) return;
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      st.t += dt;
+      draw(ctx, st.w, st.h, st.t, dt);
+      raf = requestAnimationFrame(frame);
+    }
+    function update() {
+      const go = st.visible && !document.hidden && st.forced;
+      if (go && !st.running) { st.running = true; last = performance.now(); raf = requestAnimationFrame(frame); }
+      else if (!go && st.running) { st.running = false; cancelAnimationFrame(raf); }
+    }
+    new ResizeObserver(resize).observe(canvas);
+    new IntersectionObserver((e) => { st.visible = e[0].isIntersecting; update(); }).observe(canvas);
+    document.addEventListener("visibilitychange", update);
+    document.fonts && document.fonts.ready.then(resize);
+    return { st, play() { st.forced = true; update(); }, resize };
+  }
+  function pointer(el) {
+    const p = { x: 0, y: 0, active: false };
+    el.addEventListener("pointermove", (e) => { const r = el.getBoundingClientRect(); p.x = e.clientX - r.left; p.y = e.clientY - r.top; p.active = true; });
+    el.addEventListener("pointerleave", () => { p.active = false; });
+    return p;
+  }
+
+  /* ---------- top: 13x13 glyph grid, the animejs.com signature ---------- */
+  (() => {
+    const grid = $("#glyphgrid");
+    const ramp = "·:+*#";
+    const cells = [];
+    for (let i = 0; i < 169; i++) {
+      const x = i % 13 - 6, y = Math.floor(i / 13) - 6;
+      const ring = Math.round(Math.hypot(x, y));
+      const s = document.createElement("span");
+      s.textContent = ramp[ring % ramp.length];
+      grid.appendChild(s);
+      cells.push(s);
+    }
+    if (!A) return;
+    let lastUser = 0;
+    const ripple = (from) => animate(cells, {
+      scale: [{ to: 1.9, duration: 170, ease: "out(2)" }, { to: 1, duration: 650, ease: "outElastic(1, .55)" }],
+      color: [{ to: C.accent, duration: 120 }, { to: C.dim, duration: 900, ease: "out(2)" }],
+      delay: stagger(42, { grid: [13, 13], from }),
+    });
+    grid.addEventListener("click", (e) => {
+      const i = cells.indexOf(e.target);
+      if (i >= 0) { lastUser = performance.now(); ripple(i); }
+    });
+    if (!reduce) {
+      setTimeout(() => ripple("center"), 500);
+      setInterval(() => {
+        if (document.hidden || performance.now() - lastUser < 6000) return;
+        ripple(Math.floor(Math.random() * 169));
+      }, 3600);
+    }
+    // Title scramble on load.
+    if (!reduce) animate("#title", { innerHTML: scrambleText({ chars: "a-zA-Z0-9!%#_", cursor: "█" }), delay: 150 });
+  })();
+
+  /* ---------- ascii field (shared renderer, also used by direction C) ---------- */
+  function asciiField(canvas, opts = {}) {
+    const ramp = " .·:-=+*#%@";
+    const ripples = [];
+    const p = pointer(canvas);
+    let cw = 8, ch = 16;
+    const fs = opts.size || 13;
+    const loop = canvasLoop(canvas, (ctx, w, h, t) => {
+      ctx.fillStyle = C.stage; ctx.fillRect(0, 0, w, h);
+      ctx.font = `${fs}px ${MONO}`;
+      ctx.textBaseline = "middle"; ctx.textAlign = "center";
+      const px = p.active ? p.x : w / 2 + Math.cos(t * 0.55) * w * 0.32;
+      const py = p.active ? p.y : h / 2 + Math.sin(t * 0.83) * h * 0.3;
+      const R = Math.min(w, h) * 0.45;
+      const cols = Math.ceil(w / cw), rows = Math.ceil(h / ch);
+      for (let i = ripples.length - 1; i >= 0; i--) if (t - ripples[i].t > 2) ripples.splice(i, 1);
+      for (let r = 0; r < rows; r++) {
+        const cy = r * ch + ch / 2;
+        for (let c = 0; c < cols; c++) {
+          const cx = c * cw + cw / 2;
+          const d = Math.hypot(cx - px, cy - py);
+          let v = Math.pow(Math.max(0, 1 - d / R), 1.6) * 0.95;
+          v += (Math.sin(cx * 0.021 + t * 0.9) + Math.sin(cy * 0.034 - t * 1.25) + Math.sin((cx + cy) * 0.012 + t * 0.4)) * 0.045 + 0.1;
+          for (const rp of ripples) {
+            const age = t - rp.t;
+            const band = 1 - Math.abs(Math.hypot(cx - rp.x, cy - rp.y) - age * 240) / 26;
+            if (band > 0) v += band * (1 - age / 2) * 0.9;
+          }
+          v = clamp(v);
+          const idx = Math.floor(v * (ramp.length - 1));
+          if (!idx) continue;
+          ctx.fillStyle = v > 0.56 ? C.accent : `rgba(226,232,240,${(0.1 + v * 0.55).toFixed(3)})`;
+          ctx.fillText(ramp[idx], cx, cy);
+        }
+      }
+    }, (ctx) => {
+      ctx.font = `${fs}px ${MONO}`;
+      cw = Math.max(6, ctx.measureText("M").width * 1.05);
+      ch = Math.round(fs * 1.28);
+    });
+    const add = (x, y) => { ripples.push({ x, y, t: loop.st.t }); loop.play(); };
+    canvas.addEventListener("pointerdown", (e) => { const r = canvas.getBoundingClientRect(); add(e.clientX - r.left, e.clientY - r.top); });
+    return { center() { add(loop.st.w / 2, loop.st.h / 2); } };
+  }
+  const field = asciiField($("#cvField"));
+  demos["ascii-field"] = () => field.center();
+  asciiField($("#cvMini"), { size: 11 });
+
+  /* ---------- ascii monogram ---------- */
+  (() => {
+    const canvas = $("#cvLogo");
+    const ramp = " .:-=+*#%@";
+    const noise = "!%#_|*+=<>/\\01";
+    const state = { p: reduce ? 1 : 0 };
+    const p = pointer(canvas);
+    let cols = 0, rows = 0, lum = null, cw = 8, ch = 14;
+    const hash = (a, b, c) => { const s = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return s - Math.floor(s); };
+    function sample(w, h) {
+      cols = Math.ceil(w / cw); rows = Math.ceil(h / ch);
+      const off = document.createElement("canvas");
+      off.width = cols; off.height = rows;
+      const o = off.getContext("2d");
+      o.fillStyle = "#000"; o.fillRect(0, 0, cols, rows);
+      o.fillStyle = "#fff"; o.textAlign = "center"; o.textBaseline = "middle";
+      // Cells are ~1.75x taller than wide, so squash the glyphs vertically.
+      o.save(); o.translate(cols / 2, rows / 2 + rows * 0.04); o.scale(1, cw / ch * 1.05);
+      o.font = `800 ${Math.round(rows * 1.45)}px ${SANS}`;
+      o.fillText("RA", 0, 0);
+      o.restore();
+      const d = o.getImageData(0, 0, cols, rows).data;
+      lum = new Float32Array(cols * rows);
+      for (let i = 0; i < lum.length; i++) lum[i] = d[i * 4] / 255;
+    }
+    const loop = canvasLoop(canvas, (ctx, w, h, t) => {
+      ctx.fillStyle = C.stage; ctx.fillRect(0, 0, w, h);
+      if (!lum) return;
+      ctx.font = `12px ${MONO}`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      const tick = Math.floor(t * 14);
+      for (let y = 0; y < rows; y++) {
+        const shift = Math.round(Math.sin(y * 0.33 + t * 2.1) * 1.3);
+        for (let x = 0; x < cols; x++) {
+          const sx = Math.min(cols - 1, Math.max(0, x + shift));
+          let v = lum[y * cols + sx];
+          const cx = x * cw + cw / 2, cy = y * ch + ch / 2;
+          if (p.active) v = clamp(v + Math.max(0, 1 - Math.hypot(cx - p.x, cy - p.y) / 70) * 0.35 * (v > 0.1 ? 1 : 0.4));
+          const revealed = hash(x, y, 1) < state.p;
+          if (!revealed) {
+            if (hash(x, y, tick) > 0.55) continue;
+            ctx.fillStyle = `rgba(226,232,240,${0.08 + hash(y, x, tick) * 0.25})`;
+            ctx.fillText(noise[Math.floor(hash(x, tick, y) * noise.length)], cx, cy);
+            continue;
+          }
+          if (v < 0.08) {
+            if ((x + y * 3) % 11 === 0) { ctx.fillStyle = "rgba(226,232,240,0.07)"; ctx.fillText(".", cx, cy); }
+            continue;
+          }
+          const shimmer = (Math.sin(x * 0.4 + y * 0.25 - t * 3) + 1) * 0.08;
+          const vv = clamp(v - shimmer);
+          ctx.fillStyle = vv > 0.6 ? C.accent : `rgba(52,211,153,${(0.25 + vv * 0.6).toFixed(3)})`;
+          ctx.fillText(ramp[Math.max(1, Math.floor(vv * (ramp.length - 1)))], cx, cy);
+        }
+      }
+    }, (ctx, w, h) => {
+      ctx.font = `12px ${MONO}`;
+      cw = Math.max(6, ctx.measureText("M").width * 1.02);
+      ch = 13;
+      sample(w, h);
+    });
+    const form = () => { if (!A) return; loop.play(); animate(state, { p: [0, 1], duration: 1700, ease: "inOut(2)" }); };
+    demos["ascii-logo"] = form;
+    onFirstView(canvas, form);
+  })();
+
+  /* ---------- glyph starfield ---------- */
+  (() => {
+    const canvas = $("#cvStars");
+    const p = pointer(canvas);
+    const stars = Array.from({ length: 260 }, () => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random() }));
+    const s = { speed: 0.22, cx: 0, cy: 0 };
+    const glyphs = [".", "·", "+", "*", "#"];
+    const loop = canvasLoop(canvas, (ctx, w, h, t, dt) => {
+      ctx.fillStyle = C.stage; ctx.fillRect(0, 0, w, h);
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      const tx = p.active ? (p.x / w - 0.5) * w * 0.5 : 0, ty = p.active ? (p.y / h - 0.5) * h * 0.5 : 0;
+      s.cx += (tx - s.cx) * 0.05; s.cy += (ty - s.cy) * 0.05;
+      const ox = w / 2 + s.cx, oy = h / 2 + s.cy;
+      for (const st of stars) {
+        st.z -= s.speed * dt;
+        if (st.z <= 0.02) { st.z = 1; st.x = Math.random() * 2 - 1; st.y = Math.random() * 2 - 1; }
+        const k = 0.5 / st.z;
+        const sx = ox + st.x * w * k * 0.5, sy = oy + st.y * h * k * 0.5;
+        if (sx < -10 || sx > w + 10 || sy < -10 || sy > h + 10) continue;
+        const near = 1 - st.z;
+        const gi = Math.min(glyphs.length - 1, Math.floor(near * near * glyphs.length * 1.1));
+        ctx.font = `${Math.round(9 + near * 12)}px ${MONO}`;
+        ctx.fillStyle = gi >= 3 ? C.accent : `rgba(226,232,240,${(0.15 + near * 0.75).toFixed(3)})`;
+        if (s.speed > 0.6 && gi > 0) {
+          ctx.fillStyle = `rgba(52,211,153,${(near * 0.5).toFixed(3)})`;
+          const k2 = 0.5 / (st.z + s.speed * 0.06);
+          ctx.fillText("-", ox + st.x * w * k2 * 0.5, oy + st.y * h * k2 * 0.5);
+          ctx.fillStyle = C.accent;
+        }
+        ctx.fillText(glyphs[gi], sx, sy);
+      }
+    });
+    demos["glyph-stars"] = () => { if (!A) return; loop.play(); animate(s, { speed: [{ to: 2.6, duration: 450, ease: "in(2)" }, { to: 0.22, duration: 1400, ease: "out(3)" }] }); };
+  })();
+
+  /* ---------- boot sequence ---------- */
+  (() => {
+    const log = $("#bootLog"), who = $("#bootWho");
+    const lines = [
+      ["RA-BIOS v4.5.0  (c) 2026 Rafael André", null],
+      ["cpu: caffeine-x86 @ 4.20GHz ........", "OK"],
+      ["memory: 16384M ....................", "OK"],
+      ["mounting /experience (5) ..........", "OK"],
+      ["mounting /projects (13) ...........", "OK"],
+      ["loading stack: next react ts prisma", "OK"],
+      ["starting shell ....................", "OK"],
+    ];
+    const render = (n, withOk) => {
+      log.innerHTML = lines.slice(0, n).map(([l, ok], i) =>
+        esc(l) + (ok && (i < n - 1 || withOk) ? ` <span class="ok">[ ${ok} ]</span>` : "")).join("\n");
+    };
+    render(lines.length, true);
+    const r = runner();
+    async function run() {
+      const tok = r.next();
+      who.style.opacity = 0;
+      for (let i = 1; i <= lines.length; i++) {
+        render(i, false); await sleep(90);
+        if (!r.alive(tok)) return;
+        render(i, true); await sleep(60 + Math.random() * 70);
+        if (!r.alive(tok)) return;
+      }
+      finish(tok);
+    }
+    function finish(tok) {
+      if (tok !== undefined && !r.alive(tok)) return;
+      render(lines.length, true);
+      if (A) animate(who, { opacity: [0, 1], translateY: [8, 0], duration: 500, ease: "out(3)" });
+      else who.style.opacity = 1;
+      if (A) animate(".boot .name", { innerHTML: scrambleText({ chars: "blocks" }), delay: 80 });
+    }
+    $("#bootSkip").addEventListener("click", () => { r.next(); finish(); });
+    demos.boot = run;
+    onFirstView($("#boot"), run);
+  })();
+
+  /* ---------- scramble titles ---------- */
+  (() => {
+    const hs = $$("#scr h4");
+    let set = "a-zA-Z0-9!%#_";
+    const go = (h, delay = 0) => A && animate(h, { innerHTML: scrambleText({ chars: set, cursor: set === "a-zA-Z0-9!%#_" ? "_" : "" }), delay });
+    const all = () => hs.forEach((h, i) => go(h, i * 160));
+    hs.forEach((h) => h.addEventListener("mouseenter", () => go(h)));
+    $$("#scrSets .btn").forEach((b) => b.addEventListener("click", () => {
+      $$("#scrSets .btn").forEach((x) => x.classList.toggle("on", x === b));
+      set = b.dataset.set; all();
+    }));
+    demos.scramble = all;
+    onFirstView($("#scr"), all);
+  })();
+
+  /* ---------- split text ---------- */
+  (() => {
+    if (!A) return;
+    const split = splitText("#splitP", { words: { wrap: "clip" }, chars: true });
+    let mode = "words";
+    const run = () => {
+      if (mode === "words") {
+        animate(split.chars, { opacity: 1, color: C.fg, duration: 0 });
+        animate(split.words, { translateY: ["105%", "0%"], duration: 650, ease: "out(3)", delay: stagger(28) });
+      } else {
+        animate(split.words, { translateY: "0%", duration: 0 });
+        animate(split.chars, {
+          opacity: [0, 1],
+          color: [{ from: C.accent, to: C.accent, duration: 120 }, { to: C.fg, duration: 500 }],
+          duration: 380, delay: stagger(9, { from: "random" }),
+        });
+      }
+    };
+    $$("#splitModes .btn").forEach((b) => b.addEventListener("click", () => {
+      $$("#splitModes .btn").forEach((x) => x.classList.toggle("on", x === b));
+      mode = b.dataset.mode; run();
+    }));
+    demos.split = run;
+    onFirstView($("#splitP"), run);
+  })();
+
+  /* ---------- git log --graph ---------- */
+  (() => {
+    const box = $("#gitlog"), rowsEl = $("#gitRows"), svgEl = $("#gitSvg");
+    const NS = "http://www.w3.org/2000/svg";
+    const commits = [
+      { lane: 0, h: "a1f3c9e", ref: "HEAD -> main", msg: "Alongside · Software Engineer", sub: "client platforms through RHY Consulting", date: "2026 – Present" },
+      { lane: 1, h: "7be21d4", ref: "rhy", msg: "feat: Access OS + The Cusp", sub: "deal-sourcing for PE · zero-touch hosting", date: "2026" },
+      { lane: 0, h: "4c8e0aa", msg: "Worldover · Junior Backend Developer", date: "Nov 2025 – Jun 2026" },
+      { lane: 0, h: "9d2b71f", msg: "BorgWarner · Software Developer Intern", date: "Sep 2024 – Jun 2025" },
+      { lane: 1, h: "3f9a6c2", ref: "summer", msg: "BorgWarner · Summer Internship", sub: "Python + JasperReports for production lines", date: "Jul 2024 – Aug 2024" },
+      { lane: 0, h: "e01c5b8", msg: "Petiscas Restaurant · Waiter", sub: "customer service under pressure", date: "Jul 2022 – Sep 2022" },
+      { lane: 0, h: "1a2b3c4", msg: "init", sub: "hello, world" },
+    ];
+    // Branches as [mergeRow, branchRow, forkRow] (newest first, like git log).
+    const branches = [[0, 1, 2], [3, 4, 5]];
+    const rowEls = commits.map((c) => {
+      const d = document.createElement("div");
+      d.className = "row" + (c.lane ? " lane1" : "");
+      d.innerHTML = `<span class="h">${c.h}</span> ${c.ref ? `<span class="ref">(${esc(c.ref)})</span> ` : ""}<span class="msg">${esc(c.msg)}</span>${c.sub ? `<span class="sub">${esc(c.sub)}</span>` : ""}${c.date ? `<span class="date">${esc(c.date)}</span>` : ""}`;
+      rowsEl.appendChild(d);
+      return d;
+    });
+    let anims = [], dots = [], spans = [], total = 1;
+    const X = [22, 42];
+    function build() {
+      svgEl.innerHTML = "";
+      const ys = rowEls.map((r) => r.offsetTop + 17);
+      total = rowsEl.offsetHeight;
+      svgEl.setAttribute("height", total);
+      svgEl.setAttribute("viewBox", `0 0 64 ${total}`);
+      const paths = [];
+      const mk = (d, color) => {
+        const p = document.createElementNS(NS, "path");
+        p.setAttribute("d", d); p.setAttribute("fill", "none"); p.setAttribute("stroke", color);
+        p.setAttribute("stroke-width", "2"); p.setAttribute("stroke-linecap", "round");
+        svgEl.appendChild(p); return p;
+      };
+      paths.push({ el: mk(`M${X[0]} ${ys[0]} V${ys[ys.length - 1]}`, C.accent), y0: ys[0], y1: ys[ys.length - 1] });
+      for (const [m, b, f] of branches) {
+        const d = `M${X[0]} ${ys[m]} C${X[0]} ${ys[m] + 18} ${X[1]} ${ys[b] - 22} ${X[1]} ${ys[b]} C${X[1]} ${ys[b] + 22} ${X[0]} ${ys[f] - 18} ${X[0]} ${ys[f]}`;
+        paths.push({ el: mk(d, "#7dd3fc"), y0: ys[m], y1: ys[f] });
+      }
+      dots = commits.map((c, i) => {
+        const dot = document.createElementNS(NS, "circle");
+        dot.setAttribute("cx", X[c.lane]); dot.setAttribute("cy", ys[i]); dot.setAttribute("r", 5);
+        dot.setAttribute("fill", C.stage); dot.setAttribute("stroke", c.lane ? "#7dd3fc" : C.accent); dot.setAttribute("stroke-width", 2);
+        svgEl.appendChild(dot); return { el: dot, y: ys[i] };
+      });
+      spans = paths;
+      anims = A ? paths.map((p) => animate(svg.createDrawable(p.el), { draw: ["0 0", "0 1"], duration: 1000, ease: "linear", autoplay: false })) : [];
+      sync();
+    }
+    function sync() {
+      const cut = box.scrollTop + box.clientHeight * 0.62;
+      spans.forEach((p, i) => { if (anims[i]) anims[i].seek(clamp((cut - p.y0) / Math.max(1, p.y1 - p.y0)) * 1000); });
+      dots.forEach((d) => {
+        const on = d.y <= cut;
+        d.el.setAttribute("fill", on ? (d.el.getAttribute("stroke")) : C.stage);
+        d.el.style.opacity = on ? 1 : 0.35;
+      });
+      rowEls.forEach((r, i) => { r.style.opacity = dots[i] && dots[i].y <= cut + 14 ? 1 : 0.35; });
+    }
+    box.addEventListener("scroll", sync, { passive: true });
+    new ResizeObserver(build).observe(rowsEl);
+    document.fonts && document.fonts.ready.then(build);
+    const auto = () => {
+      if (!A) return;
+      const o = { v: 0 };
+      box.scrollTop = 0;
+      animate(o, { v: box.scrollHeight - box.clientHeight, duration: 3200, ease: "inOut(2)", onUpdate: () => { box.scrollTop = o.v; } });
+    };
+    demos.gitlog = auto;
+  })();
+
+  /* ---------- npm install ---------- */
+  (() => {
+    const out = $("#npmOut");
+    const pkgs = ["next@16", "react@19", "typescript@5", "prisma@7", "postgres", "python@3.12", "supabase", "stripe", "tailwindcss@4", "d3", "docker"];
+    const spin = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏";
+    const head = `<span class="dim">$</span> npm install rafael`;
+    const done = (n, ms) => [
+      head,
+      ...pkgs.slice(0, n).map((p) => `<span class="plus">+</span> ${p}`),
+      ...(n === pkgs.length ? ["", `added ${pkgs.length} packages from 13 projects in ${ms}s`, `<span class="plus">found 0 vulnerabilities</span>`] : []),
+    ];
+    out.innerHTML = done(pkgs.length, "1.6").join("\n");
+    const r = runner();
+    async function run() {
+      const tok = r.next();
+      const t0 = performance.now();
+      for (let i = 0; i < pkgs.length; i++) {
+        for (let f = 0; f <= 10; f++) {
+          if (!r.alive(tok)) return;
+          const bar = "█".repeat(f) + "░".repeat(10 - f);
+          const lines = done(i, "");
+          lines.push(`<span class="warnc">${spin[f % spin.length]}</span> <span class="dim">fetching</span> ${pkgs[i]} <span class="dim">[${bar}]</span>`);
+          out.innerHTML = lines.slice(-12).join("\n");
+          await sleep(12);
+        }
+      }
+      if (!r.alive(tok)) return;
+      out.innerHTML = done(pkgs.length, ((performance.now() - t0) / 1000).toFixed(1)).slice(-14).join("\n");
+    }
+    demos.npm = run;
+    onFirstView(out, run);
+  })();
+
+  /* ---------- spotlight + magnetic ---------- */
+  (() => {
+    const spots = $$("#spots .spot");
+    spots.forEach((s) => s.addEventListener("pointermove", (e) => {
+      const r = s.getBoundingClientRect();
+      s.style.setProperty("--mx", `${e.clientX - r.left}px`);
+      s.style.setProperty("--my", `${e.clientY - r.top}px`);
+    }));
+    if (!A) return;
+    $$("#spots .mag").forEach((btn) => {
+      const a = createAnimatable(btn, { x: 380, y: 380, ease: "out(3)" });
+      const card = btn.closest(".spot");
+      card.addEventListener("pointermove", (e) => {
+        const r = btn.getBoundingClientRect();
+        const dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+        const near = Math.hypot(dx, dy) < 90;
+        a.x(near ? dx * 0.35 : 0); a.y(near ? dy * 0.35 : 0);
+      });
+      card.addEventListener("pointerleave", () => { a.x(0); a.y(0); });
+    });
+    demos.spotlight = () => spots.forEach((s, i) => {
+      const o = { x: -20, y: 30 };
+      animate(o, { x: 120, y: 70, duration: 1300, delay: i * 200, ease: "inOut(2)", onUpdate: () => { s.style.setProperty("--mx", `${o.x}%`); s.style.setProperty("--my", `${o.y}%`); } });
+    });
+  })();
+
+  /* ---------- circuit divider ---------- */
+  (() => {
+    const s = $("#circ");
+    const traces = [
+      "M0 110 H110 L140 80 H245",
+      "M0 150 H80 L110 180 H215 L245 150",
+      "M600 110 H490 L460 140 H355",
+      "M600 60 H510 L480 85 H355",
+      "M300 0 V40 L285 55 V70",
+      "M300 220 V185 L315 170 V150",
+      "M0 60 H60 L90 30 H180 L205 55 H245 V75",
+    ];
+    s.innerHTML = `
+      <g id="trk" fill="none" stroke="rgba(226,232,240,.08)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">${traces.map((d) => `<path d="${d}"/>`).join("")}</g>
+      <g id="lit" fill="none" stroke="${C.accent}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${traces.map((d) => `<path d="${d}"/>`).join("")}</g>
+      <g id="vias">${traces.map((d) => { const m = d.match(/M(\d+) (\d+)/); return `<circle cx="${m[1]}" cy="${m[2]}" r="5" fill="${C.stage}" stroke="${C.accent}" stroke-width="2"/>`; }).join("")}</g>
+      <rect x="245" y="70" width="110" height="80" rx="6" fill="#191a21" stroke="rgba(226,232,240,.25)"/>
+      ${[0, 1, 2, 3, 4].map((i) => `<rect x="${256 + i * 20}" y="64" width="6" height="6" fill="rgba(226,232,240,.3)"/><rect x="${256 + i * 20}" y="150" width="6" height="6" fill="rgba(226,232,240,.3)"/>`).join("")}
+      <text x="300" y="106" text-anchor="middle" font-family='${MONO}' font-size="13" fill="${C.fg}">~/projects</text>
+      <text x="300" y="126" text-anchor="middle" font-family='${MONO}' font-size="10" fill="${C.muted}">13 entries</text>
+      <g id="pk">${traces.map(() => `<rect x="-4" y="-2.5" width="8" height="5" rx="1" fill="#fff"/>`).join("")}</g>`;
+    if (!A) return;
+    const lit = $$("#lit path", s), vias = $$("#vias circle", s), packets = $$("#pk rect", s);
+    let loops = [];
+    function run() {
+      loops.forEach((l) => l.revert && l.revert());
+      loops = [];
+      packets.forEach((p) => (p.style.opacity = 0));
+      const tl = createTimeline();
+      tl.add(vias, { scale: [0, 1], duration: 300, delay: stagger(60), ease: "outBack(2)" }, 0)
+        .add(svg.createDrawable(lit), { draw: ["0 0", "0 1"], duration: 900, delay: stagger(90), ease: "inOut(2)" }, 100)
+        .call(() => {
+          if (reduce) return;
+          packets.forEach((p, i) => {
+            p.style.opacity = 1;
+            loops.push(animate(p, { ...svg.createMotionPath(lit[i]), duration: 1500 + i * 130, loop: true, ease: "inOut(1.5)", delay: i * 180 }));
+          });
+        });
+    }
+    demos.circuit = run;
+    onFirstView(s, run);
+  })();
+
+  /* ---------- sound (defined early: the shell uses it) ---------- */
+  const sfx = (() => {
+    let ctx = null, on = false;
+    const ensure = () => { if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); };
+    function click(soft) {
+      if (!on || !ctx) return;
+      const len = Math.floor(ctx.sampleRate * 0.025);
+      const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+      const d = buf.getChannelData(0);
+      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+      const src = ctx.createBufferSource(); src.buffer = buf;
+      const f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = soft ? 1400 : 2200 + Math.random() * 1600; f.Q.value = 1.2;
+      const g = ctx.createGain(); g.gain.value = soft ? 0.25 : 0.4;
+      src.connect(f).connect(g).connect(ctx.destination); src.start();
+      bump();
+    }
+    function beep(err) {
+      if (!on || !ctx) return;
+      const o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "square"; o.frequency.value = err ? 220 : 880;
+      g.gain.setValueAtTime(0.04, ctx.currentTime); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + (err ? 0.22 : 0.09));
+      o.connect(g).connect(ctx.destination); o.start(); o.stop(ctx.currentTime + 0.25);
+      bump(true);
+    }
+    const meter = $("#meter");
+    const bars = Array.from({ length: 24 }, () => { const i = document.createElement("i"); meter.appendChild(i); return i; });
+    function bump(big) {
+      if (!A) return;
+      bars.forEach((b, i) => animate(b, { height: [4 + Math.random() * (big ? 22 : 14), 3], duration: 380, delay: Math.abs(i - 11.5) * 10, ease: "out(2)" }));
+    }
+    const tog = $("#sndToggle");
+    tog.addEventListener("click", () => {
+      on = !on; ensure();
+      tog.textContent = on ? "som: ligado" : "som: desligado";
+      tog.classList.toggle("on", on); tog.setAttribute("aria-pressed", on);
+      if (on) beep();
+    });
+    return { click, beep, get on() { return on; } };
+  })();
+  (() => {
+    const inp = $("#sndIn");
+    inp.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { sfx.beep(); inp.value = ""; }
+      else if (e.key === "Backspace") sfx.click(true);
+      else if (e.key.length === 1) sfx.click();
+    });
+    const r = runner();
+    demos.sound = async () => {
+      const tok = r.next();
+      inp.value = "";
+      for (const ch of "npm run dev") {
+        if (!r.alive(tok)) return;
+        inp.value += ch; sfx.click(); await sleep(70 + Math.random() * 90);
+      }
+      await sleep(250); if (!r.alive(tok)) return;
+      sfx.beep(); await sleep(400); inp.value = "";
+    };
+  })();
+
+  /* ---------- shell ---------- */
+  (() => {
+    const out = $("#shOut"), inp = $("#shIn");
+    const projects = [
+      { slug: "access-os", t: "Access OS — Deal-Sourcing Platform for Private Equity", d: "An internal deal-sourcing platform for a private equity firm, built solo. Replaces four legacy applications with one system.", tech: "Next.js 16 · TypeScript · Prisma 7 · PostgreSQL · Python · Anthropic SDK" },
+      { slug: "the-cusp", t: "The Cusp — Website Creation & Hosting Platform", d: "Turning a payment into a live, deployed website with zero manual steps.", tech: "Next.js · Supabase · Stripe · GitHub API · Vercel API", url: "https://thecusp.ai" },
+      { slug: "xml-rpc-server", t: "XML_Parsing - RPC_Server", d: "XML file uploaded to a relational database, with X-Path queries and APIs.", tech: "XML · X-Path · SQL · REST API", url: "https://github.com/DiogoBernardes/TP2-IS" },
+      { slug: "t-pot-honeypot", t: "T-Pot Honeypot", d: "T-Pot on a Google Cloud instance, gathering and analysing attacker data.", tech: "GCP · Docker · Security", url: "https://github.com/telekom-security/tpotce" },
+      { slug: "majorities", t: "Majorities Board Game w/ AI", d: "Board game with Random, Monte Carlo and Greedy opponents.", tech: "Python · AI · Monte Carlo", url: "https://github.com/kromenz/Majorities" },
+      { slug: "money-map", t: "Money Map", d: "Expense management app with React and Prisma.", tech: "React · Prisma · TypeScript", url: "https://github.com/kromenz/Money-Map" },
+      { slug: "phaser-racing", t: "Phaser Racing Game", d: "A 2D racing game using the Phaser framework.", tech: "Phaser · JavaScript", url: "https://github.com/kromenz/TECMUL---TP1---28234" },
+    ];
+    const cmds = ["help", "whoami", "ls", "cat", "open", "neofetch", "history", "clear", "sudo"];
+    const hist = [];
+    let hi = 0;
+    const print = (html) => { out.insertAdjacentHTML("beforeend", html + "\n"); out.scrollTop = out.scrollHeight; };
+    const neofetch = () => print(
+`<span class="c-acc">██████   █████ </span>  <span class="c-acc">rafael</span>@<span class="c-acc">portfolio</span>
+<span class="c-acc">██   ██ ██   ██</span>  <span class="c-mut">─────────────────</span>
+<span class="c-acc">██████  ███████</span>  <span class="c-ref">role</span>   Software Engineer @ Alongside
+<span class="c-acc">██   ██ ██   ██</span>  <span class="c-ref">stack</span>  TypeScript · Next.js · Prisma · Postgres
+<span class="c-acc">██   ██ ██   ██</span>  <span class="c-ref">since</span>  2022 · 13 projects · 0 vulnerabilities`);
+    const run = (raw) => {
+      const line = raw.trim();
+      print(`<span class="c-acc">rafael@portfolio:~$</span> ${esc(line)}`);
+      if (!line) return;
+      hist.push(line); hi = hist.length;
+      const [c, ...rest] = line.split(/\s+/);
+      const arg = rest.join(" ");
+      switch (c) {
+        case "help": print(`<span class="c-mut">commands:</span> whoami  ls [projects]  cat &lt;file|project&gt;  open &lt;project&gt;  neofetch  history  clear  sudo hire-me`); break;
+        case "whoami": print("Rafael André — Software Engineer @ Alongside"); break;
+        case "ls":
+          if (arg.replace(/\/$/, "") === "projects") print(projects.map((p) => `<span class="c-ref">${p.slug}</span>`).join("  "));
+          else print(`<span class="c-ref">projects/</span>  <span class="c-ref">experience/</span>  about.txt  cv.pdf`);
+          break;
+        case "cat": {
+          if (arg === "about.txt") { print("Software engineer. Builds platforms end to end:\nschema, auth, payments, deploy pipelines.\nCurrently at Alongside, through RHY Consulting."); break; }
+          const p = projects.find((x) => x.slug === arg.replace(/^projects\//, ""));
+          if (p) print(`<span class="c-acc">${esc(p.t)}</span>\n${esc(p.d)}\n<span class="c-mut">${esc(p.tech)}</span>`);
+          else { print(`<span class="c-err">cat: ${esc(arg || "")}: No such file or directory</span>`); sfx.beep(true); }
+          break;
+        }
+        case "open": {
+          const p = projects.find((x) => x.slug === arg);
+          if (p && p.url) print(`opening <a href="${p.url}" target="_blank" rel="noopener">${p.url}</a>`);
+          else if (p) print(`<span class="c-mut">${p.slug} is private — ask me about it.</span>`);
+          else { print(`<span class="c-err">open: unknown project '${esc(arg)}'</span>`); sfx.beep(true); }
+          break;
+        }
+        case "neofetch": neofetch(); break;
+        case "history": print(hist.map((h, i) => `  ${String(i + 1).padStart(3)}  ${esc(h)}`).join("\n")); break;
+        case "clear": out.innerHTML = ""; break;
+        case "sudo":
+          if (arg === "hire-me") print(`[sudo] password for recruiter: ********\n<span class="c-acc">✓ access granted</span> — opening the contact form…`);
+          else print(`<span class="c-err">sudo: nice try.</span>`);
+          break;
+        default: print(`<span class="c-err">zsh: command not found: ${esc(c)}</span> <span class="c-mut">— try 'help'</span>`); sfx.beep(true);
+      }
+    };
+    inp.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { sfx.beep(); run(inp.value); inp.value = ""; return; }
+      if (e.key === "ArrowUp") { e.preventDefault(); if (hi > 0) inp.value = hist[--hi]; return; }
+      if (e.key === "ArrowDown") { e.preventDefault(); hi = Math.min(hist.length, hi + 1); inp.value = hist[hi] || ""; return; }
+      if (e.key === "Tab") {
+        e.preventDefault();
+        const v = inp.value;
+        const m = v.match(/^(cat|open|ls)\s+(\S*)$/);
+        const pool = m ? (m[1] === "ls" ? ["projects"] : [...projects.map((p) => p.slug), ...(m[1] === "cat" ? ["about.txt"] : [])]) : cmds;
+        const part = m ? m[2] : v;
+        const hits = pool.filter((x) => x.startsWith(part));
+        if (hits.length === 1) inp.value = m ? `${m[1]} ${hits[0]}` : hits[0] + " ";
+        else if (hits.length > 1) print(`<span class="c-mut">${hits.join("  ")}</span>`);
+        sfx.click(true);
+        return;
+      }
+      if (e.key.length === 1) sfx.click();
+    });
+    $$("#shQs button").forEach((b) => b.addEventListener("click", () => run(b.textContent)));
+    document.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        inp.closest(".demo").scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+        inp.focus({ preventScroll: true });
+      }
+    });
+    neofetch();
+    print(`<span class="c-mut">type 'help', or press</span> <span class="kbd">Tab</span> <span class="c-mut">to complete.</span>`);
+    const r = runner();
+    demos.shell = async () => {
+      const tok = r.next();
+      for (const cmd of ["ls projects", "cat access-os"]) {
+        inp.value = "";
+        for (const ch of cmd) { if (!r.alive(tok)) return; inp.value += ch; sfx.click(); await sleep(55); }
+        await sleep(220); if (!r.alive(tok)) return;
+        run(inp.value); inp.value = ""; await sleep(500);
+      }
+    };
+  })();
+
+  /* ---------- block caret cursor ---------- */
+  (() => {
+    const zone = $("#caretZone"), caret = $("#caret");
+    if (!A) return;
+    const a = createAnimatable(caret, { x: 260, y: 260, ease: "out(3)" });
+    const place = (x, y, mode, hgt) => {
+      caret.classList.toggle("beam", mode === "beam");
+      caret.style.height = `${hgt || 20}px`;
+      a.x(x); a.y(y);
+    };
+    place(24, 26);
+    zone.addEventListener("pointermove", (e) => {
+      if (e.pointerType !== "mouse") return;
+      const zr = zone.getBoundingClientRect();
+      const x = e.clientX - zr.left, y = e.clientY - zr.top;
+      const line = e.target.closest(".line");
+      if (e.target.tagName === "INPUT") return place(x, y - 10, "beam", 20);
+      if (line) {
+        const lr = line.getBoundingClientRect();
+        // Snap to the character cell under the pointer, so it reads as a terminal caret.
+        const cw = 8.4;
+        const col = Math.round((e.clientX - lr.left) / cw);
+        return place(lr.left - zr.left + col * cw, lr.top - zr.top + 2, "block", lr.height - 4);
+      }
+      place(x - 5, y - 10, "block", 20);
+    });
+    demos.caret = async () => {
+      const lines = $$(".line", zone);
+      const zr = zone.getBoundingClientRect();
+      for (const l of lines) {
+        const lr = l.getBoundingClientRect();
+        place(lr.left - zr.left, lr.top - zr.top + 2, "block", lr.height - 4); await sleep(260);
+        place(lr.right - zr.left, lr.top - zr.top + 2, "block", lr.height - 4); await sleep(420);
+      }
+      const ir = $("#caretInput").getBoundingClientRect();
+      place(ir.left - zr.left + 12, ir.top - zr.top + (ir.height - 20) / 2, "beam", 20);
+    };
+  })();
+
+  /* ---------- clear / glitch transition ---------- */
+  (() => {
+    const screen = $("#screen");
+    const pages = [
+      { ttl: "Experience", lines: ["$ cd ~/experience", "Alongside · Software Engineer", "Worldover · Junior Backend Developer", "BorgWarner · Software Developer Intern"] },
+      { ttl: "Projects", lines: ["$ cd ~/projects", "Access OS · deal-sourcing for PE", "The Cusp · payment → live website", "T-Pot Honeypot · GCP + Docker"] },
+      { ttl: "Contact", lines: ["$ cd ~/contact", "status: busy / heads-down", "replies within 48h", "$ ./send-message.sh"] },
+    ];
+    let i = 0, busy = false;
+    const render = (p) => {
+      screen.innerHTML = `<span class="l c-mut">${esc(p.lines[0])}</span><span class="l ttl">${esc(p.ttl)}</span>${p.lines.slice(1).map((l) => `<span class="l">${esc(l)}</span>`).join("")}`;
+      return $$(".l", screen);
+    };
+    render(pages[0]);
+    async function clearTo() {
+      if (!A || busy) return; busy = true;
+      const old = $$(".l", screen);
+      screen.insertAdjacentHTML("afterbegin", `<span class="l c-acc">$ clear</span>`);
+      await animate($$(".l", screen), { translateY: [0, -26], opacity: [1, 0], duration: 260, delay: stagger(25), ease: "in(2)" }).then(() => {});
+      i = (i + 1) % pages.length;
+      const els = render(pages[i]);
+      await animate(els, { opacity: [0, 1], translateX: [-6, 0], duration: 220, delay: stagger(85), ease: "out(2)" }).then(() => {});
+      busy = false;
+    }
+    async function glitchTo() {
+      if (!A || busy) return; busy = true;
+      screen.classList.add("rgb");
+      const slices = [[0, 0], [22, 55], [60, 12], [8, 70], [45, 30], [0, 0]];
+      const tl = createTimeline({ defaults: { duration: 45, ease: "linear" } });
+      slices.forEach(([t, b], k) => {
+        tl.add(screen, { clipPath: `inset(${t}% 0 ${b}% 0)`, translateX: k % 2 ? 6 : -5 });
+        if (k === 2) tl.call(() => { i = (i + 1) % pages.length; render(pages[i]); });
+      });
+      tl.add(screen, { clipPath: "inset(0% 0 0% 0)", translateX: 0, duration: 40 });
+      await tl.then(() => {});
+      screen.classList.remove("rgb");
+      screen.style.clipPath = ""; busy = false;
+    }
+    $("#trClear").addEventListener("click", clearTo);
+    $("#trGlitch").addEventListener("click", glitchTo);
+    let flip = false;
+    demos.transition = () => { flip = !flip; flip ? clearTo() : glitchTo(); };
+  })();
+
+  /* ---------- CRT ---------- */
+  (() => {
+    const scr = $("#crtScreen");
+    const b = $("#crtPage");
+    b.addEventListener("click", () => {
+      const on = document.documentElement.classList.toggle("crt-on");
+      b.textContent = on ? "desligar na página" : "ligar na página toda";
+      b.classList.toggle("on", on);
+    });
+    demos.crt = () => {
+      if (!A) return;
+      animate(scr, {
+        scaleY: [{ from: 0.004, to: 0.004, duration: 80 }, { to: 1, duration: 320, ease: "out(4)" }],
+        scaleX: [{ from: 0.2, to: 1, duration: 140, ease: "out(2)" }],
+        filter: [{ from: "brightness(3)", to: "brightness(3)", duration: 200 }, { to: "brightness(1)", duration: 500 }],
+      });
+    };
+  })();
+
+  /* ---------- token rain ---------- */
+  (() => {
+    const canvas = $("#cvRain");
+    const tokens = ["const", "=>", "{}", "</>", "npm", "git", "ts", "sql", "()", "&&", "??", "async", "await", "prisma", "0x", "fn", "===", "next", "[]", "use"];
+    let cols = [];
+    const fs = 14, colW = 15;
+    const reset = (w, h) => {
+      cols = Array.from({ length: Math.ceil(w / colW) }, () => ({ y: -Math.random() * h, v: 70 + Math.random() * 120, s: "", acc: 0, prev: "" }));
+    };
+    let W = 0, H = 0;
+    const loop = canvasLoop(canvas, (ctx, w, h, t, dt) => {
+      if (w !== W || h !== H || !cols.length) { W = w; H = h; reset(w, h); ctx.fillStyle = C.stage; ctx.fillRect(0, 0, w, h); }
+      ctx.fillStyle = "rgba(15,16,20,0.07)"; ctx.fillRect(0, 0, w, h);
+      ctx.font = `${fs}px ${MONO}`; ctx.textAlign = "center"; ctx.textBaseline = "top";
+      cols.forEach((c, i) => {
+        c.acc += c.v * dt;
+        while (c.acc >= fs) {
+          c.acc -= fs;
+          if (!c.s) c.s = tokens[Math.floor(Math.random() * tokens.length)] + " ";
+          const ch = c.s[0]; c.s = c.s.slice(1); c.prev = c.cur || ""; c.cur = ch;
+          c.y += fs;
+          if (c.y > 0) {
+            ctx.fillStyle = C.stage; ctx.fillRect(i * colW, c.y - fs, colW, fs);
+            if (c.prev && c.prev !== " ") { ctx.fillStyle = "rgba(52,211,153,0.9)"; ctx.fillText(c.prev, i * colW + colW / 2, c.y - fs); }
+            if (ch !== " ") { ctx.fillStyle = "#d1fae5"; ctx.fillText(ch, i * colW + colW / 2, c.y); }
+          }
+          if (c.y > h + Math.random() * h * 0.6) { c.y = -Math.random() * 80; c.s = ""; }
+        }
+      });
+    }, (ctx, w, h) => { W = w; H = h; reset(w, h); ctx.fillStyle = C.stage; ctx.fillRect(0, 0, w, h); });
+    demos.rain = () => { reset(W, H); loop.play(); };
+  })();
+
+  /* ---------- picks ---------- */
+  (() => {
+    const KEY = "motion-lab.picks.v1";
+    const load = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } };
+    const save = (s) => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {} };
+    const state = Object.assign({ picks: [], dir: "" }, load());
+    const boxes = $$(".demo .pick input");
+    const radios = $$('input[name="dir"]');
+    boxes.forEach((b) => { b.checked = state.picks.includes(b.closest(".demo").dataset.id); });
+    radios.forEach((r) => { r.checked = r.value === state.dir; });
+    function refresh() {
+      state.picks = boxes.filter((b) => b.checked).map((b) => b.closest(".demo").dataset.id);
+      state.dir = (radios.find((r) => r.checked) || {}).value || "";
+      save(state);
+      $$(".demo").forEach((d) => d.classList.toggle("picked", state.picks.includes(d.dataset.id)));
+      $$(".dir").forEach((d) => d.classList.toggle("picked", d.dataset.dir === state.dir));
+      $("#combo").classList.toggle("picked", state.dir === "B + C");
+      $("#pickCount").textContent = state.picks.length;
+      $("#pickDir").textContent = state.dir || "—";
+      const names = state.picks.map((id) => $(`.demo[data-id="${id}"]`).dataset.name);
+      $("#pickList").textContent = names.length ? names.join(" · ") : 'Marca "quero isto" nas demos de que gostares.';
+    }
+    boxes.forEach((b) => b.addEventListener("change", refresh));
+    radios.forEach((r) => r.addEventListener("change", refresh));
+    refresh();
+    const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 1600); };
+    const text = () => [
+      "Motion Lab: escolhas",
+      `Direção: ${state.dir || "(nenhuma)"}`,
+      ...(state.picks.length ? state.picks.map((id) => { const d = $(`.demo[data-id="${id}"]`); return `- ${d.dataset.name} (${d.dataset.where})`; }) : ["- (nenhuma demo marcada)"]),
+    ].join("\n");
+    $("#copyPicks").addEventListener("click", () => {
+      const t = text();
+      const fb = () => { const box = $("#fallback"); box.hidden = false; const ta = $("#fallbackText"); ta.value = t; ta.focus(); ta.select(); toast("Seleciona e copia o texto"); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast("Copiado. Cola no chat."), fb);
+      else fb();
+    });
+    $("#clearPicks").addEventListener("click", () => { boxes.forEach((b) => (b.checked = false)); radios.forEach((r) => (r.checked = false)); $("#fallback").hidden = true; refresh(); });
+  })();
+})();
+</script>

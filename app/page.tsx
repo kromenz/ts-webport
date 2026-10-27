@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@/src/components/Navbar/Navbar";
+import BootSequence from "@/src/components/Hero/BootSequence";
 import Hero from "@/src/components/Hero/Hero";
 import Projects from "@/src/components/Projects/Projects";
 import Experience from "@/src/components/Experience/Experience";
@@ -9,7 +10,6 @@ import Footer from "@/src/components/Footer/Footer";
 import ScrollButton from "@/src/components/ScrollButton/ScrollButton";
 import ScrollProgress from "@/src/components/ScrollProgress/ScrollProgress";
 import ConsoleBanner from "@/src/components/EasterEggs/ConsoleBanner";
-import KonamiCode from "@/src/components/EasterEggs/KonamiCode";
 import { MotionConfig } from "framer-motion";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -18,16 +18,18 @@ export default function Home() {
   return (
     <MotionConfig reducedMotion="never">
       <div className="flex min-h-[100dvh] flex-col bg-background text-foreground font-sans">
+        <BootSequence />
         <Analytics />
         <ScrollProgress />
         <ConsoleBanner />
-        <KonamiCode />
         <Navbar />
+        <div id="page-content" className="flex flex-1 flex-col">
         <Hero />
         <Experience />
         <Projects />
         <ContactMe />
         <Footer />
+        </div>
         <ScrollButton />
       </div>
     </MotionConfig>

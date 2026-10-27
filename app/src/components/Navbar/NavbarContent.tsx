@@ -1,15 +1,22 @@
 "use client";
 
+import { glitchJump } from "@/src/lib/glitchJump";
 import { useEffect, useState, type MouseEvent } from "react";
 import { motion } from "framer-motion";
+import { useScramble } from "@/src/lib/useScramble";
 import {
   Briefcase,
   EnvelopeSimple,
   FilePdf,
   FolderOpen,
   House,
+  SpeakerHigh,
+  SpeakerSlash,
+  TerminalWindow,
   type Icon,
 } from "@phosphor-icons/react";
+import { useSound } from "@/src/lib/useSound";
+import { openShell } from "@/src/components/CommandPalette/Shell";
 
 const CV_URL = "/docs/Rafael_Andre.pdf";
 
@@ -49,9 +56,13 @@ type Props = {
 const NavbarContent = ({ variant = "default" }: Props) => {
   const [activeSection, setActiveSection] = useState(NAV_ITEMS[0].id);
   const [hovered, setHovered] = useState<string | null>(null);
+  const scramble = useScramble();
+  const sound = useSound();
+  const SoundIcon = sound.enabled ? SpeakerHigh : SpeakerSlash;
+  const soundLabel = sound.enabled ? "sound on" : "sound off";
 
   // Real anchors, so the items are right-clickable and deep-linkable. The
-  // handler only takes over to keep the existing smooth scroll.
+  // handler only takes over to play the glitch jump.
   const goToSection = (
     event: MouseEvent<HTMLAnchorElement>,
     sectionId: string,
@@ -59,7 +70,7 @@ const NavbarContent = ({ variant = "default" }: Props) => {
     const element = document.getElementById(sectionId);
     if (!element) return;
     event.preventDefault();
-    element.scrollIntoView({ behavior: "smooth" });
+    glitchJump(sectionId);
     setActiveSection(sectionId);
   };
 
@@ -98,7 +109,7 @@ const NavbarContent = ({ variant = "default" }: Props) => {
                 onClick={(event) => goToSection(event, item.id)}
                 aria-label={item.label}
                 aria-current={isActive ? "true" : undefined}
-                className={`relative flex flex-col items-center gap-1 rounded-full px-3 py-1.5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
+                className={`relative flex flex-col items-center gap-1 rounded-full px-3 py-1.5 max-[419px]:px-2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
                   isActive ? "text-green-primary" : "text-slate-300"
                 }`}>
                 {isActive && (
@@ -114,13 +125,37 @@ const NavbarContent = ({ variant = "default" }: Props) => {
                   weight={isActive ? "fill" : "regular"}
                   aria-hidden
                 />
-                <span className="relative text-[10px] leading-none">
+                <span className="relative text-[10px] leading-none max-[379px]:hidden">
                   {item.shortLabel}
                 </span>
               </a>
             </li>
           );
         })}
+        <li>
+          <button
+            type="button"
+            onClick={openShell}
+            aria-label="open terminal"
+            aria-haspopup="dialog"
+            className="flex flex-col items-center gap-1 rounded-full px-2.5 py-1.5 max-[419px]:px-2 text-slate-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60">
+            <TerminalWindow className="h-5 w-5" aria-hidden />
+            <span className="text-[10px] leading-none max-[379px]:hidden">Shell</span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
+            onClick={sound.toggle}
+            aria-pressed={sound.enabled}
+            aria-label={soundLabel}
+            className={`flex flex-col items-center gap-1 rounded-full px-2.5 py-1.5 max-[419px]:px-2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
+              sound.enabled ? "text-green-primary" : "text-slate-300"
+            }`}>
+            <SoundIcon className="h-5 w-5" aria-hidden />
+            <span className="text-[10px] leading-none max-[379px]:hidden">Sound</span>
+          </button>
+        </li>
       </ul>
     );
   }
@@ -130,7 +165,7 @@ const NavbarContent = ({ variant = "default" }: Props) => {
   const highlighted = hovered ?? activeSection;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 whitespace-nowrap">
       <span
         className="select-none pl-1 text-xs text-foreground/35"
         aria-hidden>
@@ -145,7 +180,14 @@ const NavbarContent = ({ variant = "default" }: Props) => {
               key={item.id}
               href={`#${item.id}`}
               onClick={(event) => goToSection(event, item.id)}
-              onMouseEnter={() => setHovered(item.id)}
+              onMouseEnter={(event) => {
+                setHovered(item.id);
+                scramble(
+                  event.currentTarget.querySelector<HTMLElement>(
+                    "[data-scramble]",
+                  ),
+                );
+              }}
               onMouseLeave={() => setHovered(null)}
               onFocus={() => setHovered(item.id)}
               onBlur={() => setHovered(null)}
@@ -161,7 +203,9 @@ const NavbarContent = ({ variant = "default" }: Props) => {
                   transition={{ type: "spring", stiffness: 420, damping: 34 }}
                 />
               )}
-              <span className="relative">{item.label}</span>
+              <span className="relative" data-scramble>
+                {item.label}
+              </span>
             </a>
           );
         })}
@@ -177,6 +221,36 @@ const NavbarContent = ({ variant = "default" }: Props) => {
         <FilePdf className="h-4 w-4 shrink-0" weight="duotone" aria-hidden />
         My CV
       </a>
+
+      <button
+        type="button"
+        onClick={openShell}
+        aria-label="open terminal"
+        aria-haspopup="dialog"
+        aria-keyshortcuts="Control+K Meta+K"
+        title="open terminal (Ctrl+K)"
+        className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-foreground/80 outline-none transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-green-primary focus-visible:ring-2 focus-visible:ring-green-primary/60">
+        <TerminalWindow
+          className="h-4 w-4 shrink-0"
+          weight="duotone"
+          aria-hidden
+        />
+        <span className="text-foreground/40" aria-hidden>
+          Ctrl K
+        </span>
+      </button>
+
+      <button
+        type="button"
+        onClick={sound.toggle}
+        aria-pressed={sound.enabled}
+        aria-label={soundLabel}
+        title={soundLabel}
+        className={`inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 outline-none transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
+          sound.enabled ? "text-green-primary" : "text-foreground/60"
+        }`}>
+        <SoundIcon className="h-4 w-4" weight="duotone" aria-hidden />
+      </button>
     </div>
   );
 };

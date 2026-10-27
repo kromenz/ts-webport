@@ -1,8 +1,9 @@
 "use client";
 
+import { glitchJump } from "@/src/lib/glitchJump";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { StarfieldBackground } from "../../../../components/ui/starfield";
+import GlyphField from "./GlyphField";
 import { useSiteReducedMotion } from "@/src/lib/motion";
 
 const ROLES = [
@@ -66,7 +67,7 @@ const Hero = () => {
       id="hero"
       className="relative isolate min-h-[100dvh] flex items-center justify-center overflow-hidden pt-16 pb-20">
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <StarfieldBackground className="absolute! inset-0!" />
+        <GlyphField />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-30 bg-linear-to-b from-transparent via-background/70 to-background" />
       </div>
       <div className="container relative z-10 mx-auto px-4 text-center">
@@ -106,11 +107,7 @@ const Hero = () => {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
           className="flex justify-center gap-4">
           <button
-            onClick={() =>
-              document
-                .getElementById("projects")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
+            onClick={() => glitchJump("projects")}
             className="rounded-lg bg-white px-6 py-3 font-medium text-zinc-950 shadow-sm ring-2 ring-transparent transition-[color,box-shadow,background-color] hover:bg-transparent hover:text-white hover:ring-white">
             View Projects
           </button>

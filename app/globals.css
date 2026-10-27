@@ -250,44 +250,48 @@ body::-webkit-scrollbar-corner {
   }
 }
 
-/* Konami easter egg */
-@keyframes konami-rainbow {
-  0% {
-    filter: hue-rotate(0deg) saturate(1.4) brightness(1.1);
-  }
+/* CRT mode (Konami) */
+@keyframes crt-flick {
+  0%,
   100% {
-    filter: hue-rotate(360deg) saturate(1.4) brightness(1.1);
+    opacity: 1;
+  }
+  47% {
+    opacity: 1;
+  }
+  48% {
+    opacity: 0.93;
+  }
+  49% {
+    opacity: 1;
+  }
+  78% {
+    opacity: 0.96;
   }
 }
-@keyframes konami-flash {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: 0.55;
-  }
-  100% {
-    opacity: 0;
-  }
+html.crt-on body {
+  text-shadow: 0 0 5px rgba(52, 211, 153, 0.25);
 }
-.konami-rainbow {
-  animation: konami-rainbow 2.5s linear infinite;
-  position: relative;
-}
-.konami-rainbow::before {
-  content: "";
+#crt-overlay {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 250;
   pointer-events: none;
-  background: radial-gradient(
-    circle at center,
-    rgba(52, 211, 153, 0.6),
-    rgba(52, 211, 153, 0) 65%
-  );
-  animation: konami-flash 1.2s ease-out forwards;
-  mix-blend-mode: screen;
+  display: none;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.22) 0 1px,
+      transparent 1px 3px
+    ),
+    radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.55) 100%);
+  animation: crt-flick 4s infinite;
 }
+html.crt-on #crt-overlay {
+  display: block;
+}
+
+/* Konami toast */
 .konami-toast {
   position: fixed;
   bottom: 32px;
@@ -328,4 +332,76 @@ body::-webkit-scrollbar-corner {
   html {
     scroll-behavior: auto;
   }
+}
+
+/* Boot overlay: the inline head script sets data-boot on first visit only.
+   Without it (no JS, repeat visit, deep link) the overlay never shows. */
+html:not([data-boot]) .boot-overlay {
+  display: none;
+}
+
+/* Failsafe: if the bundle never hydrates, data-boot is never cleared. After
+   3 s (boot is at most 1.5 s plus a 300 ms fade) hide the overlay anyway. */
+@keyframes boot-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+html[data-boot] .boot-overlay {
+  animation: boot-failsafe 0s linear 3s forwards;
+}
+
+/* Projects spotlight: a green glow follows the cursor inside the pane and
+   lights its border. --mx/--my come from pointermove and --spot (0 or 1) from
+   pointerenter/leave, so nothing shows at rest. Fine pointers only; under
+   reduced motion the handlers are never attached and --spot stays 0. */
+@media (hover: hover) and (pointer: fine) {
+  .spot-pane {
+    --mx: 50%;
+    --my: 50%;
+    --spot: 0;
+    isolation: isolate;
+  }
+  .spot-pane::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: var(--spot);
+    transition: opacity 0.25s ease-out;
+    background: radial-gradient(
+      260px circle at var(--mx) var(--my),
+      rgba(52, 211, 153, 0.16),
+      transparent 62%
+    );
+  }
+  .spot-pane::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    pointer-events: none;
+    opacity: var(--spot);
+    transition: opacity 0.25s ease-out;
+    background: radial-gradient(
+      180px circle at var(--mx) var(--my),
+      rgba(52, 211, 153, 0.7),
+      transparent 70%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
+
+/* Glitch navigation: RGB split while the page wrapper is being sliced. */
+.glitching {
+  text-shadow: -2px 0 rgba(244, 114, 182, 0.85), 2px 0 rgba(125, 211, 252, 0.85);
 }
