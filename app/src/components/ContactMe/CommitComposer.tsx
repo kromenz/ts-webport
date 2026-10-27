@@ -53,6 +53,7 @@ const CommitComposer = () => {
     "idle",
   );
 
+  const sendingRef = useRef(false);
   const mountedAtRef = useRef(0);
   const subjectRef = useRef<HTMLInputElement>(null);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
@@ -101,7 +102,7 @@ const CommitComposer = () => {
   }, []);
 
   const push = useCallback(async () => {
-    if (phase === "sending") return;
+    if (sendingRef.current) return;
     const problems = validateCommit({ subject, message, from });
     if (problems.length) {
       setErrors(problems);
@@ -110,6 +111,7 @@ const CommitComposer = () => {
       beep(true);
       return;
     }
+    sendingRef.current = true;
     setErrors([]);
     setResultLines([]);
     setDelivered(false);
@@ -151,6 +153,8 @@ const CommitComposer = () => {
       if (!ok) error = payload.error ?? `HTTP ${res.status}`;
     } catch {
       error = "network error";
+    } finally {
+      sendingRef.current = false;
     }
 
     stopTick();
@@ -167,7 +171,7 @@ const CommitComposer = () => {
     } else {
       beep(true);
     }
-  }, [phase, subject, message, from, hp, reduced, beep, stopTick, fitBody]);
+  }, [subject, message, from, hp, reduced, beep, stopTick, fitBody]);
 
   const newCommit = () => {
     setPhase("idle");
@@ -180,10 +184,17 @@ const CommitComposer = () => {
   const onKeyDown = (e: ReactKeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
-      void push();
+      if (!e.repeat) void push();
       return;
     }
-    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    const tag = (e.target as HTMLElement).tagName;
+    if (
+      (tag === "INPUT" || tag === "TEXTAREA") &&
+      e.key.length === 1 &&
+      !e.ctrlKey &&
+      !e.metaKey &&
+      !e.altKey
+    ) {
       click(true);
     }
   };
@@ -218,7 +229,8 @@ const CommitComposer = () => {
     <div
       onKeyDown={onKeyDown}
       className="font-mono text-[13px]"
-      style={{ fontVariantLigatures: "none" }}>
+      style={{ fontVariantLigatures: "none" }}
+    >
       <div className="rounded-lg border border-white/10 bg-black/30 py-2">
         <div className={rowCls}>
           <span className={gutterCls} aria-hidden>
@@ -241,7 +253,8 @@ const CommitComposer = () => {
                 ? "text-amber-400"
                 : "text-foreground/35"
             }`}
-            aria-hidden>
+            aria-hidden
+          >
             {subject.length}/{SUBJECT_SOFT_MAX}
           </span>
         </div>
@@ -320,7 +333,8 @@ const CommitComposer = () => {
           onClick={() => void push()}
           disabled={phase === "sending"}
           aria-keyshortcuts="Control+Enter Meta+Enter"
-          className={`${chipBase} w-full sm:w-auto border-green-primary/50 bg-green-primary/15 text-green-primary hover:bg-green-primary/25 disabled:opacity-50`}>
+          className={`${chipBase} w-full sm:w-auto border-green-primary/50 bg-green-primary/15 text-green-primary hover:bg-green-primary/25 disabled:opacity-50`}
+        >
           <span suppressHydrationWarning>
             {modKey ? `${modKey}↵ push` : "↵ push"}
           </span>
@@ -328,28 +342,32 @@ const CommitComposer = () => {
         <button
           type="button"
           onClick={() => void copyEmail()}
-          className={chipGhost}>
+          className={chipGhost}
+        >
           {copyState === "copied" ? "✓ copied" : "copy email"}
         </button>
         <a
           href={LINKEDIN_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className={chipGhost}>
+          className={chipGhost}
+        >
           linkedin
         </a>
         <a
           href={GITHUB_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className={chipGhost}>
+          className={chipGhost}
+        >
           github
         </a>
         <a
           href={CV_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className={chipGhost}>
+          className={chipGhost}
+        >
           cv
         </a>
       </div>
@@ -360,31 +378,42 @@ const CommitComposer = () => {
         </p>
       )}
 
+      <div role="status" aria-live="polite" className="sr-only">
+        {phase === "sending"
+          ? "pushing…"
+          : phase === "done"
+            ? delivered
+              ? "delivered"
+              : (resultLines[0] ?? "push failed")
+            : ""}
+      </div>
+
       {phase !== "idle" && (
-        <div
-          role="status"
-          aria-live="polite"
-          className="mt-4 rounded-lg border border-white/10 bg-black/30 px-4 py-3 leading-relaxed">
-          {logLines.map((line, i) => {
-            const tone =
-              line.startsWith("!") || line.startsWith("error")
-                ? "text-red-400"
-                : line.startsWith("$") || line.includes("✓")
-                  ? "text-green-primary"
-                  : "text-foreground/75";
-            return (
-              <pre
-                key={i}
-                className={`m-0 whitespace-pre-wrap break-words font-mono ${tone}`}>
-                {line}
-              </pre>
-            );
-          })}
+        <div className="mt-4 rounded-lg border border-white/10 bg-black/30 px-4 py-3 leading-relaxed">
+          <div aria-hidden>
+            {logLines.map((line, i) => {
+              const tone =
+                line.startsWith("!") || line.startsWith("error")
+                  ? "text-red-400"
+                  : line.startsWith("$") || line.includes("✓")
+                    ? "text-green-primary"
+                    : "text-foreground/75";
+              return (
+                <pre
+                  key={i}
+                  className={`m-0 whitespace-pre-wrap break-words font-mono ${tone}`}
+                >
+                  {line}
+                </pre>
+              );
+            })}
+          </div>
           {phase === "done" && (
             <button
               type="button"
               onClick={newCommit}
-              className={`${chipGhost} mt-3`}>
+              className={`${chipGhost} mt-3`}
+            >
               {delivered ? "new commit" : "dismiss"}
             </button>
           )}
