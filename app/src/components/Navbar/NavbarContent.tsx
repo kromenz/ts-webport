@@ -109,7 +109,7 @@ const NavbarContent = ({ variant = "default" }: Props) => {
                 onClick={(event) => goToSection(event, item.id)}
                 aria-label={item.label}
                 aria-current={isActive ? "true" : undefined}
-                className={`relative flex flex-col items-center gap-1 rounded-full px-3 py-1.5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
+                className={`relative flex flex-col items-center gap-1 rounded-full px-3 py-1.5 max-[419px]:px-2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
                   isActive ? "text-green-primary" : "text-slate-300"
                 }`}>
                 {isActive && (
@@ -125,7 +125,7 @@ const NavbarContent = ({ variant = "default" }: Props) => {
                   weight={isActive ? "fill" : "regular"}
                   aria-hidden
                 />
-                <span className="relative text-[10px] leading-none">
+                <span className="relative text-[10px] leading-none max-[379px]:hidden">
                   {item.shortLabel}
                 </span>
               </a>
@@ -138,9 +138,9 @@ const NavbarContent = ({ variant = "default" }: Props) => {
             onClick={openShell}
             aria-label="open terminal"
             aria-haspopup="dialog"
-            className="flex flex-col items-center gap-1 rounded-full px-2.5 py-1.5 text-slate-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60">
+            className="flex flex-col items-center gap-1 rounded-full px-2.5 py-1.5 max-[419px]:px-2 text-slate-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60">
             <TerminalWindow className="h-5 w-5" aria-hidden />
-            <span className="text-[10px] leading-none">Shell</span>
+            <span className="text-[10px] leading-none max-[379px]:hidden">Shell</span>
           </button>
         </li>
         <li>
@@ -149,11 +149,11 @@ const NavbarContent = ({ variant = "default" }: Props) => {
             onClick={sound.toggle}
             aria-pressed={sound.enabled}
             aria-label={soundLabel}
-            className={`flex flex-col items-center gap-1 rounded-full px-2.5 py-1.5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
+            className={`flex flex-col items-center gap-1 rounded-full px-2.5 py-1.5 max-[419px]:px-2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
               sound.enabled ? "text-green-primary" : "text-slate-300"
             }`}>
             <SoundIcon className="h-5 w-5" aria-hidden />
-            <span className="text-[10px] leading-none">Sound</span>
+            <span className="text-[10px] leading-none max-[379px]:hidden">Sound</span>
           </button>
         </li>
       </ul>
