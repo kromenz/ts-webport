@@ -25,6 +25,11 @@ function slugify(value: string) {
     .replace(/^-+|-+$/g, "");
 }
 
+// Sidebar label: the name before " — " / " - "; the full title lives in the pane.
+function shortTitle(title: string) {
+  return title.split(/ [—-] /)[0];
+}
+
 function ProjectImagePlaceholder({ title }: { title: string }) {
   return (
     <div
@@ -173,9 +178,9 @@ const Projects = () => {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] md:h-[700px]">
+          <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
             {/* Sidebar / file tree */}
-            <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible md:overflow-y-auto border-b md:border-b-0 md:border-r border-white/10 scrollbar-custom">
+            <div className="flex md:flex-col overflow-x-auto md:overflow-visible md:pb-4 border-b md:border-b-0 md:border-r border-white/10 scrollbar-custom">
               {groups.map((group) => (
                 <div
                   key={group.type}
@@ -193,7 +198,8 @@ const Projects = () => {
                           interacted.current = true;
                           setActiveIndex(index);
                         }}
-                        className={`relative shrink-0 md:shrink text-left px-4 py-2.5 transition-colors font-mono text-sm whitespace-nowrap md:whitespace-normal ${
+                        title={project.title}
+                        className={`relative block shrink-0 md:shrink md:w-full text-left px-4 py-2 transition-colors font-mono text-sm whitespace-nowrap md:whitespace-normal ${
                           isActive
                             ? "bg-white/4 text-foreground"
                             : "text-foreground/55 hover:text-foreground hover:bg-white/2"
@@ -221,15 +227,12 @@ const Projects = () => {
                             }}
                           />
                         )}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-start gap-2">
                           <span className="text-green-primary/70">{"▸"}</span>
-                          <span className="font-medium truncate">
-                            {project.title}
+                          <span className="font-medium wrap-break-word min-w-0">
+                            {shortTitle(project.title)}
                           </span>
                         </div>
-                        <span className="block text-xs text-foreground/45 md:ml-4 ml-5">
-                          {project.type}
-                        </span>
                       </button>
                     );
                   })}
@@ -241,7 +244,7 @@ const Projects = () => {
             <div
               ref={paneRef}
               data-magnet-scope
-              className="spot-pane relative md:min-h-0"
+              className="spot-pane relative min-w-0"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -250,7 +253,7 @@ const Projects = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.2, ease: "easeOut" }}
-                  className="p-6 md:p-8 md:absolute md:inset-0 md:overflow-y-auto scrollbar-custom"
+                  className="p-6 md:p-8"
                 >
                   <div className="group relative mx-auto aspect-video w-full max-w-xl">
                     <div className="relative h-full w-full overflow-hidden rounded-lg border border-white/10 bg-white/4 transition-colors duration-300 group-hover:border-green-primary/40">
