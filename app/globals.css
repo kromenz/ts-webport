@@ -348,3 +348,33 @@ html:not([data-boot]) .boot-overlay {
 html[data-boot] .boot-overlay {
   animation: boot-failsafe 0s linear 3s forwards;
 }
+
+/* Projects spotlight: a green glow follows the cursor inside the pane and
+   lights its border. --mx/--my are set from pointermove. */
+.spot-pane {
+  --mx: 50%;
+  --my: 50%;
+  background: radial-gradient(
+    260px circle at var(--mx) var(--my),
+    rgba(52, 211, 153, 0.16),
+    transparent 62%
+  );
+}
+.spot-pane::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  pointer-events: none;
+  background: radial-gradient(
+    180px circle at var(--mx) var(--my),
+    rgba(52, 211, 153, 0.7),
+    transparent 70%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
