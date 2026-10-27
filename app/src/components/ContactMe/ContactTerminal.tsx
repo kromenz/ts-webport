@@ -396,7 +396,7 @@ const ContactTerminal = () => {
   const onKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      sound.click();
+      sound.beep();
       submit();
       return;
     }

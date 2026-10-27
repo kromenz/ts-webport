@@ -221,7 +221,7 @@ export default function Shell() {
   const onInputKey = (e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      sound.click();
+      sound.beep();
       const v = input;
       setInput("");
       draftRef.current = "";
