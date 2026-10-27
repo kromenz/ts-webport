@@ -12,9 +12,11 @@ import {
   House,
   SpeakerHigh,
   SpeakerSlash,
+  TerminalWindow,
   type Icon,
 } from "@phosphor-icons/react";
 import { useSound } from "@/src/lib/useSound";
+import { openShell } from "@/src/components/CommandPalette/Shell";
 
 const CV_URL = "/docs/Rafael_Andre.pdf";
 
@@ -133,6 +135,17 @@ const NavbarContent = ({ variant = "default" }: Props) => {
         <li>
           <button
             type="button"
+            onClick={openShell}
+            aria-label="open terminal"
+            aria-haspopup="dialog"
+            className="flex flex-col items-center gap-1 rounded-full px-2.5 py-1.5 text-slate-300 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60">
+            <TerminalWindow className="h-5 w-5" aria-hidden />
+            <span className="text-[10px] leading-none">Shell</span>
+          </button>
+        </li>
+        <li>
+          <button
+            type="button"
             onClick={sound.toggle}
             aria-pressed={sound.enabled}
             aria-label={soundLabel}
@@ -208,6 +221,24 @@ const NavbarContent = ({ variant = "default" }: Props) => {
         <FilePdf className="h-4 w-4 shrink-0" weight="duotone" aria-hidden />
         My CV
       </a>
+
+      <button
+        type="button"
+        onClick={openShell}
+        aria-label="open terminal"
+        aria-haspopup="dialog"
+        aria-keyshortcuts="Control+K Meta+K"
+        title="open terminal (Ctrl+K)"
+        className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm font-medium text-foreground/80 outline-none transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 hover:text-green-primary focus-visible:ring-2 focus-visible:ring-green-primary/60">
+        <TerminalWindow
+          className="h-4 w-4 shrink-0"
+          weight="duotone"
+          aria-hidden
+        />
+        <span className="text-foreground/40" aria-hidden>
+          Ctrl K
+        </span>
+      </button>
 
       <button
         type="button"

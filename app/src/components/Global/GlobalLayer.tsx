@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 import KonamiCode from "@/src/components/EasterEggs/KonamiCode";
+import Shell from "@/src/components/CommandPalette/Shell";
 import { CrtProvider } from "@/src/lib/useCrt";
 import { SoundProvider } from "@/src/lib/useSound";
 import { siteReducedMotion } from "@/src/lib/motion";
@@ -23,6 +24,7 @@ export default function GlobalLayer({ children }: { children: ReactNode }) {
         {children}
         <CrtOverlay />
         <KonamiCode />
+        <Shell />
       </CrtProvider>
     </SoundProvider>
   );

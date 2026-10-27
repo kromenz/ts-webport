@@ -8,6 +8,7 @@ import {
   useState,
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
+import { useSound } from "@/src/lib/useSound";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const EMAIL = "andrerafael892@gmail.com";
@@ -84,6 +85,11 @@ const ContactTerminal = () => {
   const mountedAtRef = useRef(Date.now());
   const counterRef = useRef(WELCOME.length);
 
+  const sound = useSound();
+  const beepRef = useRef(sound.beep);
+  useEffect(() => {
+    beepRef.current = sound.beep;
+  }, [sound.beep]);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -93,6 +99,7 @@ const ContactTerminal = () => {
       ...l,
       id: ++counterRef.current,
     }));
+    if (lines.some((l) => l.tone === "error")) beepRef.current(true);
     setHistory((prev) => [...prev, ...withIds]);
   }, []);
 
@@ -120,6 +127,14 @@ const ContactTerminal = () => {
   }, [history, stage, busy]);
 
   const focusInput = () => inputRef.current?.focus();
+
+  // The Ctrl+K shell asks for focus here. preventScroll: the glitch jump owns
+  // the scrolling, focusing must not fight it.
+  useEffect(() => {
+    const onFocus = () => inputRef.current?.focus({ preventScroll: true });
+    window.addEventListener("contact:focus", onFocus);
+    return () => window.removeEventListener("contact:focus", onFocus);
+  }, []);
 
   const resetToMenu = useCallback(() => {
     setForm({ from: "", subject: "", message: "" });
@@ -381,8 +396,11 @@ const ContactTerminal = () => {
   const onKeyDown = (e: ReactKeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
+      sound.click();
       submit();
+      return;
     }
+    if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) sound.click();
   };
 
   const placeholder = useMemo(() => {
