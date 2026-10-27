@@ -2,9 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { tokenStream } from "@/src/lib/ascii/tokens";
 import { siteReducedMotion } from "@/src/lib/motion";
-
-const CHARS = "01{}[]()<>/\\|;:=+-*#$&%_abcdefghijklmnopqrstuvwxyz";
 
 /** Fraction of the width, each side, that the texture is confined to. */
 const BAND = 0.32;
@@ -34,6 +33,8 @@ type Glyph = {
   speed: number;
   alpha: number;
   ch: string;
+  /** This drop's own stream of stack-token characters. */
+  next: () => string;
 };
 
 type Node = {
@@ -46,8 +47,6 @@ type Node = {
   /** Which band the node belongs to, so edges never jump the card. */
   band: 0 | 1;
 };
-
-const pick = () => CHARS[Math.floor(Math.random() * CHARS.length)];
 
 /** The grid is the constant; this is the layer that changes per section. */
 export type BackdropVariant = "glyph" | "graph";
@@ -113,7 +112,7 @@ const SectionBackdrop = ({ variant = "glyph", className }: Props) => {
         ctx.fillText(glyph.ch, glyph.x, glyph.y);
         if (!advance) continue;
         glyph.y += glyph.speed;
-        if (Math.random() < 0.03) glyph.ch = pick();
+        if (Math.random() < 0.03) glyph.ch = glyph.next();
         if (glyph.y > height + 12) {
           glyph.y = -12;
           glyph.speed = 0.3 + Math.random() * 0.7;
@@ -211,12 +210,14 @@ const SectionBackdrop = ({ variant = "glyph", className }: Props) => {
         const column = (x: number) => {
           const alpha = GLYPH_ALPHA * nearness(x);
           for (let d = 0; d < DROPS_PER_COLUMN; d++) {
+            const next = tokenStream();
             glyphs.push({
               x,
               y: Math.random() * height,
               speed: 0.3 + Math.random() * 0.7,
               alpha,
-              ch: pick(),
+              ch: next(),
+              next,
             });
           }
         };

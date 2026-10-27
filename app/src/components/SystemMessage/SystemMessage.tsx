@@ -21,6 +21,8 @@ type Props = {
   children?: ReactNode;
   /** Ways out of here. */
   actions: ReactNode;
+  /** Replaces the default section backdrop (the 404 uses token rain). */
+  backdrop?: ReactNode;
 };
 
 /**
@@ -38,6 +40,7 @@ const SystemMessage = ({
   note,
   children,
   actions,
+  backdrop,
 }: Props) => {
   const reduce = useSiteReducedMotion();
 
@@ -58,7 +61,7 @@ const SystemMessage = ({
 
   return (
     <main className="relative isolate flex min-h-[100dvh] items-center justify-center overflow-hidden px-4 py-16">
-      <SectionBackdrop />
+      {backdrop ?? <SectionBackdrop />}
 
       <motion.section
         initial={{ opacity: 0, y: reduce ? 0 : 12 }}

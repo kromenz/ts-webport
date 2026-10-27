@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import SystemMessage from "./SystemMessage";
+import TokenRain from "./TokenRain";
 
 /** Everything this site actually has, in the order the page presents it. */
 const ENTRIES = [
@@ -28,6 +29,7 @@ const NotFoundTerminal = () => {
       command={`cd ~${shown}`}
       stderr={`cd: no such file or directory: ~${shown}`}
       exitCode="404"
+      backdrop={<TokenRain />}
       note="nothing lives at that path. these do:"
       actions={
         <Link
