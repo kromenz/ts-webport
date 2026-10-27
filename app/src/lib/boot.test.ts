@@ -29,6 +29,56 @@ describe("shouldBoot", () => {
   });
 });
 
+/** Runs the real inline script against stubbed globals; returns data-boot. */
+function runScript(
+  storage: { getItem: (k: string) => string | null } | "throws" | "absent",
+  hash: string,
+) {
+  const dataset: Record<string, string> = {};
+  const win =
+    storage === "absent"
+      ? {}
+      : {
+          get sessionStorage() {
+            if (storage === "throws") throw new Error("denied");
+            return storage;
+          },
+        };
+  new Function("window", "location", "document", BOOT_SCRIPT)(
+    win,
+    { hash },
+    { documentElement: { dataset } },
+  );
+  return dataset.boot;
+}
+
+describe("BOOT_SCRIPT mirrors shouldBoot", () => {
+  const none = { getItem: () => null };
+  test("clean first visit sets the flag", () => {
+    expect(runScript(none, "")).toBe("1");
+  });
+  test("already booted does not", () => {
+    expect(runScript({ getItem: () => "1" }, "")).toBeUndefined();
+  });
+  test("deep link does not", () => {
+    expect(runScript(none, "#projects")).toBeUndefined();
+  });
+  test("throwing storage does not, and does not throw", () => {
+    expect(runScript("throws", "")).toBeUndefined();
+  });
+  test("getItem throwing does not", () => {
+    const bad = {
+      getItem: () => {
+        throw new Error();
+      },
+    };
+    expect(runScript(bad, "")).toBeUndefined();
+  });
+  test("missing storage does not", () => {
+    expect(runScript("absent", "")).toBeUndefined();
+  });
+});
+
 describe("boot data", () => {
   test("mount counts come from the data", () => {
     const text = BOOT_LINES.map(([t]) => t).join("\n");

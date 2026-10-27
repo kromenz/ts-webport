@@ -335,3 +335,16 @@ body::-webkit-scrollbar-corner {
 html:not([data-boot]) .boot-overlay {
   display: none;
 }
+
+/* Failsafe: if the bundle never hydrates, data-boot is never cleared. After
+   3 s (boot is at most 1.5 s plus a 300 ms fade) hide the overlay anyway. */
+@keyframes boot-failsafe {
+  to {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+html[data-boot] .boot-overlay {
+  animation: boot-failsafe 0s linear 3s forwards;
+}
