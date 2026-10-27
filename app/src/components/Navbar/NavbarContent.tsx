@@ -2,6 +2,7 @@
 
 import { useEffect, useState, type MouseEvent } from "react";
 import { motion } from "framer-motion";
+import { useScramble } from "@/src/lib/useScramble";
 import {
   Briefcase,
   EnvelopeSimple,
@@ -49,6 +50,7 @@ type Props = {
 const NavbarContent = ({ variant = "default" }: Props) => {
   const [activeSection, setActiveSection] = useState(NAV_ITEMS[0].id);
   const [hovered, setHovered] = useState<string | null>(null);
+  const scramble = useScramble();
 
   // Real anchors, so the items are right-clickable and deep-linkable. The
   // handler only takes over to keep the existing smooth scroll.
@@ -145,7 +147,14 @@ const NavbarContent = ({ variant = "default" }: Props) => {
               key={item.id}
               href={`#${item.id}`}
               onClick={(event) => goToSection(event, item.id)}
-              onMouseEnter={() => setHovered(item.id)}
+              onMouseEnter={(event) => {
+                setHovered(item.id);
+                scramble(
+                  event.currentTarget.querySelector<HTMLElement>(
+                    "[data-scramble]",
+                  ),
+                );
+              }}
               onMouseLeave={() => setHovered(null)}
               onFocus={() => setHovered(item.id)}
               onBlur={() => setHovered(null)}
@@ -161,7 +170,9 @@ const NavbarContent = ({ variant = "default" }: Props) => {
                   transition={{ type: "spring", stiffness: 420, damping: 34 }}
                 />
               )}
-              <span className="relative">{item.label}</span>
+              <span className="relative" data-scramble>
+                {item.label}
+              </span>
             </a>
           );
         })}
