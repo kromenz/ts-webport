@@ -206,6 +206,7 @@ export const WORK_EXPERIENCE = [
     title: "BorgWarner",
     position: "Summer Internship",
     date: "Jul 2024 - Aug 2024",
+    branch: true,
     responsibilities: [
       "I began my internship at BorgWarner focusing on integrating Jasper with Python to generate various reports for the factory's production lines. My key responsibilities include:",
       [
