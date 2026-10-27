@@ -15,6 +15,26 @@ const GRID_FONT_SIZE = 13;
 const CELL_H = 17;
 const MAX_DPR = 2;
 
+/** Star glyph sizes run MIN..MAX px, one cached font string per size. */
+const STAR_MIN_SIZE = 9;
+const STAR_MAX_SIZE = 21;
+const STAR_FONTS = Array.from(
+  { length: STAR_MAX_SIZE - STAR_MIN_SIZE + 1 },
+  (_, i) => `${STAR_MIN_SIZE + i}px ${FONT}`,
+);
+const GRID_FONT = `${GRID_FONT_SIZE}px ${FONT}`;
+
+/** Alpha is quantised into LEVELS steps so fill strings are looked up, not built. */
+const LEVELS = 32;
+const STAR_FILLS = Array.from(
+  { length: LEVELS },
+  (_, i) => `rgba(226,232,240,${(0.15 + (i / (LEVELS - 1)) * 0.75).toFixed(3)})`,
+);
+const GRID_FILLS = Array.from(
+  { length: LEVELS },
+  (_, i) => `rgba(226,232,240,${(0.1 + (i / (LEVELS - 1)) * 0.55).toFixed(3)})`,
+);
+
 type Star = { x: number; y: number; z: number };
 
 const makeStar = (z = Math.random()): Star => ({
@@ -53,6 +73,10 @@ const GlyphField = ({ className }: { className?: string }) => {
     let cellW = 8;
     let light = false;
     let stars: Star[] = [];
+    // Scratch space reused every frame: projected positions and per-size lists.
+    let projX = new Float32Array(0);
+    let projY = new Float32Array(0);
+    const buckets: number[][] = STAR_FONTS.map(() => []);
     const ripples: Ripple[] = [];
     const pointer = { active: false, x: 0, y: 0 };
     const vanish = { x: 0, y: 0 };
@@ -80,6 +104,8 @@ const GlyphField = ({ className }: { className?: string }) => {
 
       const count = light ? STAR_COUNT_LIGHT : STAR_COUNT;
       stars = Array.from({ length: count }, () => makeStar());
+      projX = new Float32Array(count);
+      projY = new Float32Array(count);
       measureCell();
     };
 
@@ -96,7 +122,11 @@ const GlyphField = ({ className }: { className?: string }) => {
       const ox = width / 2 + vanish.x;
       const oy = height / 2 + vanish.y;
 
-      for (const star of stars) {
+      // Pass A: advance and project, filing each visible star under its size
+      // so the font is parsed once per size per frame, not once per star.
+      for (const bucket of buckets) bucket.length = 0;
+      for (let i = 0; i < stars.length; i++) {
+        const star = stars[i];
         if (!still) {
           star.z -= STAR_SPEED * dt;
           if (star.z <= 0.02) Object.assign(star, makeStar(1));
@@ -105,14 +135,26 @@ const GlyphField = ({ className }: { className?: string }) => {
         const sx = ox + star.x * width * k * 0.5;
         const sy = oy + star.y * height * k * 0.5;
         if (sx < -10 || sx > width + 10 || sy < -10 || sy > height + 10) continue;
-        const near = 1 - star.z;
-        const glyph = starGlyph(star.z);
-        ctx.font = `${Math.round(9 + near * 12)}px ${FONT}`;
-        ctx.fillStyle =
-          glyph === "*" || glyph === "#"
-            ? ACCENT
-            : `rgba(226,232,240,${(0.15 + near * 0.75).toFixed(3)})`;
-        ctx.fillText(glyph, sx, sy);
+        projX[i] = sx;
+        projY[i] = sy;
+        const size = Math.round(STAR_MIN_SIZE + (1 - star.z) * 12);
+        buckets[size - STAR_MIN_SIZE].push(i);
+      }
+
+      // Pass B: draw bucket by bucket.
+      for (let b = 0; b < buckets.length; b++) {
+        const bucket = buckets[b];
+        if (bucket.length === 0) continue;
+        ctx.font = STAR_FONTS[b];
+        for (const i of bucket) {
+          const z = stars[i].z;
+          const glyph = starGlyph(z);
+          ctx.fillStyle =
+            glyph === "*" || glyph === "#"
+              ? ACCENT
+              : STAR_FILLS[Math.round((1 - z) * (LEVELS - 1))];
+          ctx.fillText(glyph, projX[i], projY[i]);
+        }
       }
     };
 
@@ -131,31 +173,57 @@ const GlyphField = ({ className }: { className?: string }) => {
       const cols = Math.ceil(width / stepX);
       const rows = Math.ceil(height / stepY);
 
-      // Without ripples nothing outside the cursor radius can be lit.
-      let c0 = 0;
-      let c1 = cols;
-      let r0 = 0;
-      let r1 = rows;
-      if (ripples.length === 0) {
-        c0 = Math.max(0, Math.floor((px - radius) / stepX));
-        c1 = Math.min(cols, Math.ceil((px + radius) / stepX));
-        r0 = Math.max(0, Math.floor((py - radius) / stepY));
-        r1 = Math.min(rows, Math.ceil((py + radius) / stepY));
+      // Nothing outside the cursor box or a live ripple's outer ring (radius
+      // age*240 + band width) can be lit, so only those boxes are scanned.
+      // Boxes are in pixels: [left, top, right, bottom].
+      const boxes: number[][] = [[px - radius, py - radius, px + radius, py + radius]];
+      for (const rp of ripples) {
+        const age = t - rp.t;
+        if (age < 0 || age >= 2) continue;
+        const reach = age * 240 + 26;
+        boxes.push([rp.x - reach, rp.y - reach, rp.x + reach, rp.y + reach]);
       }
 
-      ctx.font = `${GRID_FONT_SIZE}px ${FONT}`;
+      ctx.font = GRID_FONT;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      for (let r = r0; r < r1; r++) {
+      const spans: number[][] = [];
+      for (let r = 0; r < rows; r++) {
         const cy = r * stepY + stepY / 2;
-        for (let c = c0; c < c1; c++) {
-          const cx = c * stepX + stepX / 2;
-          const v = bloomAt(cx, cy, px, py, radius, ripples, t);
-          const ch = rampChar(v);
-          if (ch === " ") continue;
-          ctx.fillStyle =
-            v > 0.56 ? ACCENT : `rgba(226,232,240,${(0.1 + v * 0.55).toFixed(3)})`;
-          ctx.fillText(ch, cx, cy);
+        // Column ranges of every box touching this row, merged so no cell is
+        // drawn twice.
+        spans.length = 0;
+        for (const box of boxes) {
+          if (cy < box[1] - stepY / 2 || cy > box[3] + stepY / 2) continue;
+          const a = Math.max(0, Math.floor(box[0] / stepX));
+          const z = Math.min(cols, Math.ceil(box[2] / stepX));
+          if (z > a) spans.push([a, z]);
+        }
+        if (spans.length === 0) continue;
+        spans.sort((m, n) => m[0] - n[0]);
+        let from = spans[0][0];
+        let to = spans[0][1];
+        const merged: number[][] = [];
+        for (let s = 1; s < spans.length; s++) {
+          if (spans[s][0] <= to) to = Math.max(to, spans[s][1]);
+          else {
+            merged.push([from, to]);
+            from = spans[s][0];
+            to = spans[s][1];
+          }
+        }
+        merged.push([from, to]);
+
+        for (const [c0, c1] of merged) {
+          for (let c = c0; c < c1; c++) {
+            const cx = c * stepX + stepX / 2;
+            const v = bloomAt(cx, cy, px, py, radius, ripples, t);
+            const ch = rampChar(v);
+            if (ch === " ") continue;
+            ctx.fillStyle =
+              v > 0.56 ? ACCENT : GRID_FILLS[Math.round(v * (LEVELS - 1))];
+            ctx.fillText(ch, cx, cy);
+          }
         }
       }
     };
