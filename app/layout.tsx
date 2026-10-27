@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fira_Code, Geist } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { BOOT_SCRIPT } from "@/src/lib/boot";
 
 // Sans carries body copy and headings; mono is reserved for the terminal
 // chrome (prompts, file names, pills, dates).
@@ -76,7 +77,12 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // The inline boot script sets data-boot before hydration.
+      suppressHydrationWarning
       className={cn("font-sans", geist.variable, firaCode.variable)}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
+      </head>
       <body suppressHydrationWarning className="antialiased">
         {children}
       </body>

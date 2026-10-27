@@ -329,3 +329,9 @@ body::-webkit-scrollbar-corner {
     scroll-behavior: auto;
   }
 }
+
+/* Boot overlay: the inline head script sets data-boot on first visit only.
+   Without it (no JS, repeat visit, deep link) the overlay never shows. */
+html:not([data-boot]) .boot-overlay {
+  display: none;
+}

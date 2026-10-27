@@ -1,6 +1,7 @@
 "use client";
 
 import Navbar from "@/src/components/Navbar/Navbar";
+import BootSequence from "@/src/components/Hero/BootSequence";
 import Hero from "@/src/components/Hero/Hero";
 import Projects from "@/src/components/Projects/Projects";
 import Experience from "@/src/components/Experience/Experience";
@@ -18,6 +19,7 @@ export default function Home() {
   return (
     <MotionConfig reducedMotion="never">
       <div className="flex min-h-[100dvh] flex-col bg-background text-foreground font-sans">
+        <BootSequence />
         <Analytics />
         <ScrollProgress />
         <ConsoleBanner />
