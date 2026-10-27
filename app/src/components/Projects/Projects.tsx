@@ -101,8 +101,17 @@ const Projects = () => {
       pane.style.setProperty("--mx", `${e.clientX - r.left}px`);
       pane.style.setProperty("--my", `${e.clientY - r.top}px`);
     };
+    const on = () => pane.style.setProperty("--spot", "1");
+    const off = () => pane.style.setProperty("--spot", "0");
     pane.addEventListener("pointermove", onMove);
-    return () => pane.removeEventListener("pointermove", onMove);
+    pane.addEventListener("pointerenter", on);
+    pane.addEventListener("pointerleave", off);
+    return () => {
+      pane.removeEventListener("pointermove", onMove);
+      pane.removeEventListener("pointerenter", on);
+      pane.removeEventListener("pointerleave", off);
+      off();
+    };
   }, [reduced]);
 
   const scramble = useScramble();
