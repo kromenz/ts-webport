@@ -101,6 +101,27 @@ const CommitComposer = () => {
     setBodyRows(rows);
   }, []);
 
+  // Re-fit when the editor's width changes (window resize, rotation).
+  useEffect(() => {
+    const el = bodyRef.current;
+    if (!el) return;
+    let ro: ResizeObserver | undefined;
+    if (typeof ResizeObserver !== "undefined") {
+      let lastW = el.clientWidth;
+      ro = new ResizeObserver(() => {
+        if (el.clientWidth === lastW) return;
+        lastW = el.clientWidth;
+        fitBody();
+      });
+      ro.observe(el);
+    }
+    window.addEventListener("resize", fitBody);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", fitBody);
+    };
+  }, [fitBody]);
+
   const push = useCallback(async () => {
     if (sendingRef.current) return;
     const problems = validateCommit({ subject, message, from });
@@ -331,9 +352,9 @@ const CommitComposer = () => {
         <button
           type="button"
           onClick={() => void push()}
-          disabled={phase === "sending"}
+          aria-disabled={phase === "sending"}
           aria-keyshortcuts="Control+Enter Meta+Enter"
-          className={`${chipBase} w-full sm:w-auto border-green-primary/50 bg-green-primary/15 text-green-primary hover:bg-green-primary/25 disabled:opacity-50`}
+          className={`${chipBase} w-full sm:w-auto border-green-primary/50 bg-green-primary/15 text-green-primary hover:bg-green-primary/25 aria-disabled:opacity-50 aria-disabled:cursor-default`}
         >
           <span suppressHydrationWarning>
             {modKey ? `${modKey}↵ push` : "↵ push"}
@@ -379,13 +400,17 @@ const CommitComposer = () => {
       )}
 
       <div role="status" aria-live="polite" className="sr-only">
-        {phase === "sending"
-          ? "pushing…"
-          : phase === "done"
-            ? delivered
-              ? "delivered"
-              : (resultLines[0] ?? "push failed")
-            : ""}
+        {copyState === "copied"
+          ? "email address copied"
+          : copyState === "failed"
+            ? "clipboard blocked, email address shown below"
+            : phase === "sending"
+              ? "pushing…"
+              : phase === "done"
+                ? delivered
+                  ? "delivered"
+                  : (resultLines[0] ?? "push failed")
+                : ""}
       </div>
 
       {phase !== "idle" && (
