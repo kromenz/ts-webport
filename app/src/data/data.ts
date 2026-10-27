@@ -1,3 +1,11 @@
+export const PROFILE = {
+  name: "Rafael André",
+  role: "Software Engineer @ RHY Consulting",
+  about:
+    "Software engineer. Builds platforms end to end: schema, auth, payments, deploy pipelines. Currently at RHY Consulting, through Alongside.",
+  since: 2022,
+};
+
 export type Project = {
   title: string;
   imageUrl?: string;
@@ -290,7 +298,7 @@ export const WORK_EXPERIENCE = [
     position: "Software Engineer",
     date: "2026 - Present",
     responsibilities: [
-      "Software engineer at Alongside, delivering client platforms through RHY Consulting. Three projects to date:",
+      "Software engineer at RHY Consulting, through Alongside. Three projects to date:",
 
       "Agentic Finance Readiness — a payments consultancy via RHY, Sep 2026 to present. The client had a deck ranking 14+ financial platforms (ERPs, SME accounting, AP, AR) on how ready they were for AI agents, but every rating came from vendor documentation. What was missing was proof: how far an AI agent actually gets through Order-to-Cash and Procure-to-Pay on each platform, and whether it can work unsupervised. I was lead engineer on a three-person team and sole author of the codebase. An agent attempts each step of the finance process through five different access paths, every attempt is recorded as a run with screenshots, recordings and the exact point where it stopped, and a private dashboard shows the client, step by step and path by path, what the agent achieved, what failed and what is still untested. I built the repository and data contract, the validation schemas, the database and import pipeline, the full dashboard, the agent devcontainer and the browser-automation scripts, and ran tests across four platforms — 71 runs and 330 step results in roughly ten days.",
 
