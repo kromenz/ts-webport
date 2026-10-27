@@ -10,8 +10,11 @@ import {
   FilePdf,
   FolderOpen,
   House,
+  SpeakerHigh,
+  SpeakerSlash,
   type Icon,
 } from "@phosphor-icons/react";
+import { useSound } from "@/src/lib/useSound";
 
 const CV_URL = "/docs/Rafael_Andre.pdf";
 
@@ -52,6 +55,9 @@ const NavbarContent = ({ variant = "default" }: Props) => {
   const [activeSection, setActiveSection] = useState(NAV_ITEMS[0].id);
   const [hovered, setHovered] = useState<string | null>(null);
   const scramble = useScramble();
+  const sound = useSound();
+  const SoundIcon = sound.enabled ? SpeakerHigh : SpeakerSlash;
+  const soundLabel = sound.enabled ? "sound on" : "sound off";
 
   // Real anchors, so the items are right-clickable and deep-linkable. The
   // handler only takes over to play the glitch jump.
@@ -124,6 +130,19 @@ const NavbarContent = ({ variant = "default" }: Props) => {
             </li>
           );
         })}
+        <li>
+          <button
+            type="button"
+            onClick={sound.toggle}
+            aria-pressed={sound.enabled}
+            aria-label={soundLabel}
+            className={`flex flex-col items-center gap-1 rounded-full px-2.5 py-1.5 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
+              sound.enabled ? "text-green-primary" : "text-slate-300"
+            }`}>
+            <SoundIcon className="h-5 w-5" aria-hidden />
+            <span className="text-[10px] leading-none">Sound</span>
+          </button>
+        </li>
       </ul>
     );
   }
@@ -133,7 +152,7 @@ const NavbarContent = ({ variant = "default" }: Props) => {
   const highlighted = hovered ?? activeSection;
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-3 whitespace-nowrap">
       <span
         className="select-none pl-1 text-xs text-foreground/35"
         aria-hidden>
@@ -189,6 +208,18 @@ const NavbarContent = ({ variant = "default" }: Props) => {
         <FilePdf className="h-4 w-4 shrink-0" weight="duotone" aria-hidden />
         My CV
       </a>
+
+      <button
+        type="button"
+        onClick={sound.toggle}
+        aria-pressed={sound.enabled}
+        aria-label={soundLabel}
+        title={soundLabel}
+        className={`inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 outline-none transition-colors hover:border-green-primary/40 hover:bg-green-primary/10 focus-visible:ring-2 focus-visible:ring-green-primary/60 ${
+          sound.enabled ? "text-green-primary" : "text-foreground/60"
+        }`}>
+        <SoundIcon className="h-4 w-4" weight="duotone" aria-hidden />
+      </button>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useCrt } from "@/src/lib/useCrt";
 
 const SEQUENCE = [
   "ArrowUp",
@@ -16,28 +17,37 @@ const SEQUENCE = [
 ];
 
 const KonamiCode = () => {
+  const { on, toggle } = useCrt();
+  // Refs keep the key listener mounted once while seeing the latest values.
+  const onRef = useRef(on);
+  const toggleRef = useRef(toggle);
+  useEffect(() => {
+    onRef.current = on;
+    toggleRef.current = toggle;
+  });
+
   useEffect(() => {
     let buffer: string[] = [];
     let toastTimer: ReturnType<typeof setTimeout> | null = null;
-    let modeTimer: ReturnType<typeof setTimeout> | null = null;
+    let toast: HTMLDivElement | null = null;
 
     const activate = () => {
+      const next = !onRef.current;
+      // Keep the ref current so a second activation before re-render flips back.
+      onRef.current = next;
+      toggleRef.current();
       console.log(
-        "%c🎮 konami unlocked",
+        "%c🎮 crt mode: " + (next ? "on" : "off"),
         "color:#34d399;font-weight:700;font-family:ui-monospace,monospace;font-size:13px;",
       );
-      document.body.classList.add("konami-rainbow");
-      const toast = document.createElement("div");
-      toast.textContent = "// konami unlocked //";
+      toast?.remove();
+      toast = document.createElement("div");
+      toast.textContent = `// crt mode: ${next ? "on" : "off"}`;
       toast.className = "konami-toast";
       document.body.appendChild(toast);
       if (toastTimer) clearTimeout(toastTimer);
-      if (modeTimer) clearTimeout(modeTimer);
-      toastTimer = setTimeout(() => toast.remove(), 4000);
-      modeTimer = setTimeout(
-        () => document.body.classList.remove("konami-rainbow"),
-        8000,
-      );
+      const mine = toast;
+      toastTimer = setTimeout(() => mine.remove(), 4000);
     };
 
     const onKey = (event: KeyboardEvent) => {
@@ -60,7 +70,7 @@ const KonamiCode = () => {
     return () => {
       window.removeEventListener("keydown", onKey);
       if (toastTimer) clearTimeout(toastTimer);
-      if (modeTimer) clearTimeout(modeTimer);
+      toast?.remove();
     };
   }, []);
 

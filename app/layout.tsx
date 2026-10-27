@@ -3,6 +3,7 @@ import { Fira_Code, Geist } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { BOOT_SCRIPT } from "@/src/lib/boot";
+import GlobalLayer from "@/src/components/Global/GlobalLayer";
 
 // Sans carries body copy and headings; mono is reserved for the terminal
 // chrome (prompts, file names, pills, dates).
@@ -84,7 +85,7 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>
       <body suppressHydrationWarning className="antialiased">
-        {children}
+        <GlobalLayer>{children}</GlobalLayer>
       </body>
     </html>
   );

@@ -10,7 +10,6 @@ import Footer from "@/src/components/Footer/Footer";
 import ScrollButton from "@/src/components/ScrollButton/ScrollButton";
 import ScrollProgress from "@/src/components/ScrollProgress/ScrollProgress";
 import ConsoleBanner from "@/src/components/EasterEggs/ConsoleBanner";
-import KonamiCode from "@/src/components/EasterEggs/KonamiCode";
 import { MotionConfig } from "framer-motion";
 import { Analytics } from "@vercel/analytics/next";
 
@@ -23,7 +22,6 @@ export default function Home() {
         <Analytics />
         <ScrollProgress />
         <ConsoleBanner />
-        <KonamiCode />
         <Navbar />
         <div id="page-content" className="flex flex-1 flex-col">
         <Hero />
