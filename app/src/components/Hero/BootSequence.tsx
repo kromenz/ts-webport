@@ -10,6 +10,14 @@ const HOLD_MS = 220;
 const FADE_MS = 300;
 const REVEAL_MS = 1000;
 const MAX_DPR = 2;
+/**
+ * The CSS failsafe hides the overlay 3 s after first paint. The sequence needs
+ * about 1.3 s of timers plus the 300 ms fade, so it can only complete if it
+ * starts before roughly 1.4 s. Start later than 1 s and the 0.4 s of margin
+ * (timer drift on a loaded main thread) is gone: skip instead of being cut off.
+ * Normal hydration lands well under that, so the boot still plays.
+ */
+const START_BUDGET_MS = 1000;
 
 const MONO = '"Fira Code", ui-monospace, monospace';
 const RAMP = " .:-=+*#%@";
@@ -112,8 +120,15 @@ const BootSequence = () => {
       );
     };
 
-    // Reduced motion: no sequence, no flash. Straight to the hero.
-    if (siteReducedMotion()) {
+    const overlayHidden = () => getComputedStyle(overlay).visibility === "hidden";
+
+    // Reduced motion, or hydration so late that the CSS failsafe has hidden
+    // (or is about to hide) the overlay: no sequence, straight to the hero.
+    if (
+      siteReducedMotion() ||
+      performance.now() > START_BUDGET_MS ||
+      overlayHidden()
+    ) {
       markBooted();
       delete root.dataset.boot;
       return;
@@ -126,6 +141,16 @@ const BootSequence = () => {
     let i = 0;
     const step = () => {
       if (done) return;
+      // The failsafe fired mid-sequence (main thread starved): stop cleanly
+      // rather than keep scroll locked under an invisible overlay.
+      if (overlayHidden()) {
+        done = true;
+        timers.forEach(clearTimeout);
+        markBooted();
+        delete root.dataset.boot;
+        root.style.overflow = "";
+        return;
+      }
       i += 1;
       render(i, true);
       if (i < BOOT_LINES.length) {
