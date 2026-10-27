@@ -4,15 +4,8 @@ import { useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
 import SectionBackdrop from "@/src/components/SectionBackdrop/SectionBackdrop";
-import ContactTerminal from "./ContactTerminal";
-
-const SIGNATURE = [
-  "  ____         __            _      _              _",
-  " |  _ \\ __ _ / _| __ _  ___| |    / \\   _ __   __| |_ __ ___",
-  " | |_) / _` | |_ / _` |/ _ \\ |   / _ \\ | '_ \\ / _` | '__/ _ \\",
-  " |  _ < (_| |  _| (_| |  __/ |  / ___ \\| | | | (_| | | |  __/",
-  " |_| \\_\\__,_|_|  \\__,_|\\___|_| /_/   \\_\\_| |_|\\__,_|_|  \\___|",
-].join("\n");
+import Monogram from "@/src/components/Monogram/Monogram";
+import CommitComposer from "./CommitComposer";
 
 function formatLisbonTime(): string {
   return new Intl.DateTimeFormat("en-GB", {
@@ -42,7 +35,12 @@ const ContactMe = () => {
       id="contact"
       className="relative isolate overflow-hidden py-20 md:py-28">
       <SectionBackdrop />
-      <SectionDivider command="cd ../contacts" />
+      <SectionDivider
+        label="Contact"
+        path="~/contact"
+        command="git remote -v"
+        output="inbox  rafael (push) · replies < 24h"
+      />
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
@@ -55,19 +53,35 @@ const ContactMe = () => {
             <span className="w-3 h-3 rounded-full bg-yellow-400/70" />
             <span className="w-3 h-3 rounded-full bg-green-primary/80" />
             <span className="ml-3 text-xs text-foreground/50 font-mono truncate">
-              contact.sh
+              COMMIT_EDITMSG
             </span>
           </div>
 
           <div className="p-6 md:p-8 font-mono">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/55 mb-6">
-              <span className="text-foreground/40">{"//"}</span>
-              <span>Lisbon</span>
-              <span className="text-foreground/30">·</span>
-              <span className="tabular-nums" suppressHydrationWarning>
-                {time ?? "--:--"}
+            <p className="font-sans text-foreground/75 leading-relaxed mb-6 text-sm md:text-base">
+              Currently heads-down on a project. Still happy to hear from you —
+              I&apos;ll reply when I can.
+            </p>
+
+            <CommitComposer />
+
+            <div className="mt-8 flex justify-center">
+              <Monogram />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-t border-white/10 bg-white/3 px-4 py-2 font-mono text-xs">
+            <div className="flex items-center gap-3">
+              <span className="text-green-primary">[0] contact*</span>
+              <span style={{ color: "#7dd3fc" }}>main ●</span>
+            </div>
+            <div className="flex items-center gap-3 text-foreground/60">
+              <span>
+                Lisbon{" "}
+                <span className="tabular-nums" suppressHydrationWarning>
+                  {time ?? "--:--"}
+                </span>
               </span>
-              <span className="text-foreground/30">·</span>
               <span className="inline-flex items-center gap-1.5">
                 <span className="relative inline-flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-60" />
@@ -75,21 +89,6 @@ const ContactMe = () => {
                 </span>
                 <span className="text-amber-400/90">busy</span>
               </span>
-            </div>
-
-            <p className="font-sans text-foreground/75 leading-relaxed mb-6 text-sm md:text-base">
-              Currently heads-down on a project. Still happy to hear from you —
-              I&apos;ll reply when I can.
-            </p>
-
-            <ContactTerminal />
-
-            <div className="mt-8 flex justify-center overflow-x-auto">
-              <pre
-                className="select-none text-[8px] sm:text-[10px] leading-tight text-foreground/25"
-                aria-hidden>
-                {SIGNATURE}
-              </pre>
             </div>
           </div>
         </motion.div>

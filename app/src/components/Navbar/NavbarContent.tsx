@@ -18,7 +18,7 @@ import {
 import { useSound } from "@/src/lib/useSound";
 import { openShell } from "@/src/components/CommandPalette/Shell";
 
-const CV_URL = "/docs/Rafael_Andre.pdf";
+export const CV_URL = "/docs/Rafael_Andre.pdf";
 
 type NavItem = {
   id: string;

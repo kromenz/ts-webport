@@ -3,6 +3,12 @@
 import { useEffect, useRef } from "react";
 
 import { BOOT_KEY, BOOT_LINES } from "@/src/lib/boot";
+import {
+  CELL_H,
+  CELL_W,
+  drawMonogram,
+  sampleMonogram,
+} from "@/src/lib/ascii/monogram";
 import { siteReducedMotion } from "@/src/lib/motion";
 
 const LINE_MS = 140;
@@ -18,40 +24,6 @@ const MAX_DPR = 2;
  * Normal hydration lands well under that, so the boot still plays.
  */
 const START_BUDGET_MS = 1000;
-
-const MONO = '"Fira Code", ui-monospace, monospace';
-const RAMP = " .:-=+*#%@";
-const NOISE = "!%#_|*+=<>/\\01";
-const CELL_W = 8;
-const CELL_H = 14;
-
-const hash = (a: number, b: number, c: number) => {
-  const s = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453;
-  return s - Math.floor(s);
-};
-
-/** "RA" in Geist 800, sampled to a luminance grid (one value per cell). */
-function sampleMonogram(cols: number, rows: number, family: string) {
-  const off = document.createElement("canvas");
-  off.width = cols;
-  off.height = rows;
-  const o = off.getContext("2d");
-  if (!o) return null;
-  o.fillStyle = "#000";
-  o.fillRect(0, 0, cols, rows);
-  o.fillStyle = "#fff";
-  o.textAlign = "center";
-  o.textBaseline = "middle";
-  // Cells are taller than wide, so squash the glyphs vertically to compensate.
-  o.translate(cols / 2, rows / 2 + rows * 0.04);
-  o.scale(1, (CELL_W / CELL_H) * 1.05);
-  o.font = `800 ${Math.round(rows * 1.45)}px ${family}`;
-  o.fillText("RA", 0, 0);
-  const d = o.getImageData(0, 0, cols, rows).data;
-  const lum = new Float32Array(cols * rows);
-  for (let i = 0; i < lum.length; i++) lum[i] = d[i * 4] / 255;
-  return lum;
-}
 
 /**
  * First-visit BIOS screen. The overlay markup is always in the server HTML and
@@ -183,35 +155,16 @@ const BootSequence = () => {
         if (document.hidden) return;
         if (!lum) lum = sampleMonogram(cols, rows, family);
         if (!lum) return;
-        const t = (now - t0) / 1000;
-        const p = Math.min(1, (now - t0) / REVEAL_MS);
-        const eased = p * p * (3 - 2 * p);
-        const tick = Math.floor(t * 14);
-        ctx.clearRect(0, 0, cssW, cssH);
-        ctx.font = `12px ${MONO}`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        for (let y = 0; y < rows; y++) {
-          for (let x = 0; x < cols; x++) {
-            const cx = x * CELL_W + CELL_W / 2;
-            const cy = y * CELL_H + CELL_H / 2;
-            if (hash(x, y, 1) >= eased) {
-              if (hash(x, y, tick) > 0.55) continue;
-              ctx.fillStyle = `rgba(226,232,240,${(0.08 + hash(y, x, tick) * 0.25).toFixed(3)})`;
-              ctx.fillText(
-                NOISE[Math.floor(hash(x, tick, y) * NOISE.length)],
-                cx,
-                cy,
-              );
-              continue;
-            }
-            const v = lum[y * cols + x];
-            if (v < 0.08) continue;
-            ctx.fillStyle =
-              v > 0.6 ? "#34d399" : `rgba(52,211,153,${(0.25 + v * 0.6).toFixed(3)})`;
-            ctx.fillText(RAMP[Math.max(1, Math.floor(v * (RAMP.length - 1)))], cx, cy);
-          }
-        }
+        drawMonogram(
+          ctx,
+          lum,
+          cols,
+          rows,
+          cssW,
+          cssH,
+          (now - t0) / REVEAL_MS,
+          (now - t0) / 1000,
+        );
       };
       const start = () => {
         if (!disposed && !done) raf = requestAnimationFrame(draw);

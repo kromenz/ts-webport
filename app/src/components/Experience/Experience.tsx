@@ -4,10 +4,11 @@
 import { useCallback, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FilePdf, X, ArrowSquareOut } from "@phosphor-icons/react";
-import { WORK_EXPERIENCE } from "@/src/data/data";
+import { PROFILE, WORK_EXPERIENCE } from "@/src/data/data";
 import CommitGraph from "./CommitGraph";
 import NpmInstall from "./NpmInstall";
 import { buildCommits } from "@/src/lib/gitGraph";
+import { experienceOutput } from "@/src/lib/sectionPrompts";
 import { useScramble } from "@/src/lib/useScramble";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
 import SectionBackdrop from "@/src/components/SectionBackdrop/SectionBackdrop";
@@ -58,7 +59,12 @@ const Experience = () => {
       id="experience"
       className="relative isolate overflow-hidden pt-24 pb-40 md:pb-48">
       <SectionBackdrop />
-      <SectionDivider command="cd ../work_experience" />
+      <SectionDivider
+        label="Experience"
+        path="~/experience"
+        command="git log --oneline | wc -l"
+        output={experienceOutput(WORK_EXPERIENCE, PROFILE.since)}
+      />
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto rounded-2xl border border-white/10 bg-[#17171e]/92 overflow-hidden shadow-xl shadow-black/20">
           {/* Window chrome */}
