@@ -62,6 +62,7 @@ export const PROJECTS: Project[] = [
   },
   {
     title: "The Cusp — Website Creation & Hosting Platform",
+    imageUrl: "/assets/images/thecusp.png",
     description:
       "Turning a payment into a live, deployed website with zero manual steps. The Cusp is a website creation and hosting platform. A customer signs up, picks a plan, and pays; everything after that is automatic. The platform provisions their GitHub repository, creates their Vercel project, publishes a branded \"under construction\" placeholder, and streams every step of the build back to them in real time until the site is live. I owned the backbone of that flow — schema design, authentication, payment integration, the customer dashboard, and the provisioning and deploy pipeline — along with the hosting lifecycle that suspends and restores sites as subscriptions change.",
     type: "Work",
@@ -180,7 +181,7 @@ export const PROJECTS: Project[] = [
   },
   {
     title: "Money Map",
-    imageUrl: "/assets/images/moneymap.png",
+    imageUrl: "/assets/images/moneymap-budget.png",
     description:
       "Expense management application developed with React and Prisma, helping you monitor and organize your finances in a simple and intuitive way. ",
     githubUrl: "https://github.com/kromenz/Money-Map",
