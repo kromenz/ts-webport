@@ -4,15 +4,8 @@ import { useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
 import SectionBackdrop from "@/src/components/SectionBackdrop/SectionBackdrop";
+import Monogram from "@/src/components/Monogram/Monogram";
 import CommitComposer from "./CommitComposer";
-
-const SIGNATURE = [
-  "  ____         __            _      _              _",
-  " |  _ \\ __ _ / _| __ _  ___| |    / \\   _ __   __| |_ __ ___",
-  " | |_) / _` | |_ / _` |/ _ \\ |   / _ \\ | '_ \\ / _` | '__/ _ \\",
-  " |  _ < (_| |  _| (_| |  __/ |  / ___ \\| | | | (_| | | |  __/",
-  " |_| \\_\\__,_|_|  \\__,_|\\___|_| /_/   \\_\\_| |_|\\__,_|_|  \\___|",
-].join("\n");
 
 function formatLisbonTime(): string {
   return new Intl.DateTimeFormat("en-GB", {
@@ -71,12 +64,8 @@ const ContactMe = () => {
 
             <CommitComposer />
 
-            <div className="mt-8 flex justify-center overflow-x-auto">
-              <pre
-                className="select-none text-[8px] sm:text-[10px] leading-tight text-foreground/25"
-                aria-hidden>
-                {SIGNATURE}
-              </pre>
+            <div className="mt-8 flex justify-center">
+              <Monogram />
             </div>
           </div>
 
