@@ -2,7 +2,7 @@
 
 import { ArrowLeft } from "@phosphor-icons/react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useSyncExternalStore } from "react";
 
 import SystemMessage from "./SystemMessage";
 import TokenRain from "./TokenRain";
@@ -18,8 +18,22 @@ const ENTRIES = [
 /** Long enough to recognise the path, short enough not to break the card. */
 const MAX_PATH = 42;
 
+const noopSubscribe = () => () => {};
+const clientPath = () => window.location.pathname;
+/** The 404 is prerendered once at build time, so the server cannot know which
+    path the visitor typed. */
+const serverPath = () => "";
+
 const NotFoundTerminal = () => {
-  const pathname = usePathname();
+  // usePathname() is not usable here: the prerendered HTML carries the
+  // internal "/_not-found" route, and the client's real path then mismatches
+  // it on hydration (React error #418 in production). A server snapshot of ""
+  // keeps hydration identical, and React re-renders with the real path.
+  const pathname = useSyncExternalStore(
+    noopSubscribe,
+    clientPath,
+    serverPath,
+  );
   const shown =
     pathname.length > MAX_PATH ? `${pathname.slice(0, MAX_PATH)}…` : pathname;
 
