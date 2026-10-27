@@ -36,6 +36,7 @@ const ContactMe = () => {
       className="relative isolate overflow-hidden py-20 md:py-28">
       <SectionBackdrop />
       <SectionDivider
+        label="Contact"
         path="~/contact"
         command="git remote -v"
         output="inbox  rafael (push) · replies < 24h"

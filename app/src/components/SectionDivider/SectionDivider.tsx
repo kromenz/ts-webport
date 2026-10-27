@@ -6,6 +6,7 @@ import { motion, useInView } from "framer-motion";
 import { useSiteReducedMotion } from "@/src/lib/motion";
 
 type Props = {
+  label: string;
   path: string;
   command: string;
   output: string;
@@ -34,7 +35,7 @@ const segmentClass =
  * refs, so nothing here branches on client-only values and no-JS visitors see
  * everything. None of these elements is animated by framer-motion.
  */
-const SectionDivider = ({ path, command, output, className }: Props) => {
+const SectionDivider = ({ label, path, command, output, className }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.4 });
   const reduceMotion = useSiteReducedMotion();
@@ -154,7 +155,7 @@ const SectionDivider = ({ path, command, output, className }: Props) => {
       className={`container mx-auto px-4 mb-10 md:mb-14 ${className ?? ""}`}>
       <div className="flex flex-col items-center gap-4">
         <h2 className="w-fit max-w-full text-left font-mono">
-          <span className="sr-only">{`${path} — ${command}: ${output}`}</span>
+          <span className="sr-only">{`${label} — ${output}`}</span>
           <span aria-hidden className="block">
             <span className="flex flex-wrap pl-0.5 text-xs sm:text-sm">
               {segments.map((s, i) => (
@@ -169,11 +170,20 @@ const SectionDivider = ({ path, command, output, className }: Props) => {
                 </span>
               ))}
             </span>
-            <span className="mt-2 block text-2xl md:text-3xl font-bold text-foreground/85 break-words">
-              <span ref={promptRef} className="text-green-primary">
-                ❯{" "}
+            {/* Both copies share one grid cell: the invisible one reserves the
+                final box, so typing never resizes the heading. */}
+            <span className="mt-2 grid text-2xl md:text-3xl font-bold text-foreground/85">
+              <span
+                aria-hidden
+                className="invisible col-start-1 row-start-1 min-w-0 break-words">
+                ❯ {command}
               </span>
-              <span ref={commandRef}>{command}</span>
+              <span className="col-start-1 row-start-1 min-w-0 break-words">
+                <span ref={promptRef} className="text-green-primary">
+                  ❯{" "}
+                </span>
+                <span ref={commandRef}>{command}</span>
+              </span>
             </span>
             <span className="mt-1 block pl-[2ch] text-sm font-normal text-foreground/55">
               <span ref={outputRef} className="inline-block">

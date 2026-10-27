@@ -60,6 +60,7 @@ const Experience = () => {
       className="relative isolate overflow-hidden pt-24 pb-40 md:pb-48">
       <SectionBackdrop />
       <SectionDivider
+        label="Experience"
         path="~/experience"
         command="git log --oneline | wc -l"
         output={experienceOutput(WORK_EXPERIENCE, PROFILE.since)}

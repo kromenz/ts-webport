@@ -161,6 +161,7 @@ const Projects = () => {
     >
       <SectionBackdrop variant="graph" />
       <SectionDivider
+        label="Projects"
         path="~/projects"
         command="ls --count"
         output={projectsOutput(PROJECTS)}
@@ -238,6 +239,9 @@ const Projects = () => {
                             {shortTitle(project.title)}
                           </span>
                         </div>
+                        <span className="md:hidden mt-0.5 block pl-5 text-[10px] font-normal text-foreground/40">
+                          {project.type ?? "Other"}
+                        </span>
                       </button>
                     );
                   })}
