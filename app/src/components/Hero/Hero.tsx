@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { StarfieldBackground } from "../../../../components/ui/starfield";
+import GlyphField from "./GlyphField";
 import { useSiteReducedMotion } from "@/src/lib/motion";
 
 const ROLES = [
@@ -66,7 +66,7 @@ const Hero = () => {
       id="hero"
       className="relative isolate min-h-[100dvh] flex items-center justify-center overflow-hidden pt-16 pb-20">
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <StarfieldBackground className="absolute! inset-0!" />
+        <GlyphField />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-30 bg-linear-to-b from-transparent via-background/70 to-background" />
       </div>
       <div className="container relative z-10 mx-auto px-4 text-center">
