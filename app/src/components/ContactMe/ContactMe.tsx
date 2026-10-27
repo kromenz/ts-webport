@@ -42,7 +42,11 @@ const ContactMe = () => {
       id="contact"
       className="relative isolate overflow-hidden py-20 md:py-28">
       <SectionBackdrop />
-      <SectionDivider command="cd ../contacts" />
+      <SectionDivider
+        path="~/contact"
+        command="git remote -v"
+        output="inbox  rafael (push) · replies < 24h"
+      />
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.97 }}

@@ -10,6 +10,7 @@ import { PROJECTS } from "@/src/data/data";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
 import SectionBackdrop from "@/src/components/SectionBackdrop/SectionBackdrop";
 import { useSiteReducedMotion } from "@/src/lib/motion";
+import { projectsOutput } from "@/src/lib/sectionPrompts";
 import { useMagnetic } from "@/src/lib/useMagnetic";
 import { useScramble } from "@/src/lib/useScramble";
 import { useSplitReveal } from "@/src/lib/useSplitReveal";
@@ -159,7 +160,11 @@ const Projects = () => {
       className="relative isolate overflow-hidden pt-24 pb-32 md:pb-40"
     >
       <SectionBackdrop variant="graph" />
-      <SectionDivider command="cd ../projects" />
+      <SectionDivider
+        path="~/projects"
+        command="ls --count"
+        output={projectsOutput(PROJECTS)}
+      />
       <div className="container mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 24, scale: 0.97 }}
