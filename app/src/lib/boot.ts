@@ -7,13 +7,15 @@ export const BOOT_KEY = "ra:booted";
  * Whether this visit should play the boot. Any failure (no storage, a
  * throwing getter in private mode) means "no": the boot is decoration and must
  * never be the thing that breaks the page. A hash means a deep link, which
- * should land on its section without a screen in the way.
+ * should land on its section without a screen in the way. The boot belongs to
+ * the home page only: elsewhere (404, error) nothing would ever clear it.
  */
 export function shouldBoot(
   storage: Pick<Storage, "getItem"> | null,
   hash: string,
+  pathname = "/",
 ): boolean {
-  if (!storage || hash) return false;
+  if (!storage || hash || pathname !== "/") return false;
   try {
     return storage.getItem(BOOT_KEY) === null;
   } catch {
@@ -25,7 +27,7 @@ export function shouldBoot(
  * Inline pre-paint script for <head>. Same rules as shouldBoot, written as a
  * string so it runs before first paint and the overlay never flashes the hero.
  */
-export const BOOT_SCRIPT = `try{if(!location.hash&&window.sessionStorage.getItem(${JSON.stringify(
+export const BOOT_SCRIPT = `try{if(location.pathname==="/"&&!location.hash&&window.sessionStorage.getItem(${JSON.stringify(
   BOOT_KEY,
 )})===null)document.documentElement.dataset.boot="1"}catch(e){}`;
 

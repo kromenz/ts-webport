@@ -24,8 +24,12 @@ describe("shouldBoot", () => {
   test("false on a deep link", () => {
     expect(shouldBoot({ getItem: () => null }, "#projects")).toBe(false);
   });
+  test("false off the home page", () => {
+    expect(shouldBoot({ getItem: () => null }, "", "/nope")).toBe(false);
+  });
   test("true on a clean first visit", () => {
     expect(shouldBoot({ getItem: () => null }, "")).toBe(true);
+    expect(shouldBoot({ getItem: () => null }, "", "/")).toBe(true);
   });
 });
 
@@ -33,6 +37,7 @@ describe("shouldBoot", () => {
 function runScript(
   storage: { getItem: (k: string) => string | null } | "throws" | "absent",
   hash: string,
+  pathname = "/",
 ) {
   const dataset: Record<string, string> = {};
   const win =
@@ -46,7 +51,7 @@ function runScript(
         };
   new Function("window", "location", "document", BOOT_SCRIPT)(
     win,
-    { hash },
+    { hash, pathname },
     { documentElement: { dataset } },
   );
   return dataset.boot;
@@ -59,6 +64,9 @@ describe("BOOT_SCRIPT mirrors shouldBoot", () => {
   });
   test("already booted does not", () => {
     expect(runScript({ getItem: () => "1" }, "")).toBeUndefined();
+  });
+  test("other routes do not", () => {
+    expect(runScript(none, "", "/nope")).toBeUndefined();
   });
   test("deep link does not", () => {
     expect(runScript(none, "#projects")).toBeUndefined();
