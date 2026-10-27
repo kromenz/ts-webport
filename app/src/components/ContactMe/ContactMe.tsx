@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 import { motion } from "framer-motion";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
 import SectionBackdrop from "@/src/components/SectionBackdrop/SectionBackdrop";
-import ContactTerminal from "./ContactTerminal";
+import CommitComposer from "./CommitComposer";
 
 const SIGNATURE = [
   "  ____         __            _      _              _",
@@ -59,34 +59,17 @@ const ContactMe = () => {
             <span className="w-3 h-3 rounded-full bg-yellow-400/70" />
             <span className="w-3 h-3 rounded-full bg-green-primary/80" />
             <span className="ml-3 text-xs text-foreground/50 font-mono truncate">
-              contact.sh
+              COMMIT_EDITMSG
             </span>
           </div>
 
           <div className="p-6 md:p-8 font-mono">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/55 mb-6">
-              <span className="text-foreground/40">{"//"}</span>
-              <span>Lisbon</span>
-              <span className="text-foreground/30">·</span>
-              <span className="tabular-nums" suppressHydrationWarning>
-                {time ?? "--:--"}
-              </span>
-              <span className="text-foreground/30">·</span>
-              <span className="inline-flex items-center gap-1.5">
-                <span className="relative inline-flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-60" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-400" />
-                </span>
-                <span className="text-amber-400/90">busy</span>
-              </span>
-            </div>
-
             <p className="font-sans text-foreground/75 leading-relaxed mb-6 text-sm md:text-base">
               Currently heads-down on a project. Still happy to hear from you —
               I&apos;ll reply when I can.
             </p>
 
-            <ContactTerminal />
+            <CommitComposer />
 
             <div className="mt-8 flex justify-center overflow-x-auto">
               <pre
@@ -94,6 +77,28 @@ const ContactMe = () => {
                 aria-hidden>
                 {SIGNATURE}
               </pre>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 border-t border-white/10 bg-white/3 px-4 py-2 font-mono text-xs">
+            <div className="flex items-center gap-3">
+              <span className="text-green-primary">[0] contact*</span>
+              <span style={{ color: "#7dd3fc" }}>main ●</span>
+            </div>
+            <div className="flex items-center gap-3 text-foreground/60">
+              <span>
+                Lisbon{" "}
+                <span className="tabular-nums" suppressHydrationWarning>
+                  {time ?? "--:--"}
+                </span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="relative inline-flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-amber-400 opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-amber-400" />
+                </span>
+                <span className="text-amber-400/90">busy</span>
+              </span>
             </div>
           </div>
         </motion.div>
