@@ -8,6 +8,7 @@ import {
   isFresh,
   isRevealed,
   lockedCell,
+  lockedColor,
   noiseCell,
   noiseTick,
 } from "./monogram";
@@ -74,12 +75,28 @@ describe("monogram maths", () => {
   });
 });
 
-describe("isFresh", () => {
-  test("only cells that just locked in are fresh", () => {
-    expect(isFresh(1, 1, 1)).toBe(hash(1, 1, 1) >= 0.85);
-    // A fully revealed grid has no fresh cell once the window has passed.
+describe("isFresh / lockedColor", () => {
+  test("at settled progress (eased === 1) no cell is fresh", () => {
+    for (let y = 0; y < 20; y++) {
+      for (let x = 0; x < 20; x++) expect(isFresh(x, y, 1)).toBe(false);
+    }
+  });
+
+  test("mid-reveal some just-locked cells are fresh", () => {
     let fresh = 0;
-    for (let i = 0; i < 100; i++) if (isFresh(i, 0, 1.2)) fresh++;
-    expect(fresh).toBe(0);
+    for (let x = 0; x < 200; x++) if (isFresh(x, 0, 0.5)) fresh++;
+    expect(fresh).toBeGreaterThan(0);
+  });
+
+  test("settled frame colours every locked cell with the quiet tint", () => {
+    for (let y = 0; y < 20; y++) {
+      for (let x = 0; x < 20; x++) {
+        expect(lockedColor(x, y, 1, 1, 0.3)).toMatch(/^rgba\(226,232,240,/);
+      }
+    }
+  });
+
+  test("without settled the boot's green is kept", () => {
+    expect(lockedColor(1, 1, 1, 1)).toBe("#34d399");
   });
 });

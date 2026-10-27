@@ -27,7 +27,21 @@ export const isRevealed = (x: number, y: number, eased: number) =>
 
 /** True for a revealed cell that locked in within the last `window` of eased progress. */
 export const isFresh = (x: number, y: number, eased: number, window = 0.15) =>
-  hash(x, y, 1) >= eased - window;
+  eased < 1 && hash(x, y, 1) >= eased - window;
+
+/** Colour of a locked cell: green while fresh (or when not settling), else the quiet tint. */
+export function lockedColor(
+  x: number,
+  y: number,
+  eased: number,
+  v: number,
+  settled?: number,
+) {
+  const c = lockedCell(v);
+  if (!c) return null;
+  if (settled === undefined || isFresh(x, y, eased)) return c.color;
+  return `rgba(226,232,240,${(settled * (0.45 + v * 0.55)).toFixed(3)})`;
+}
 
 /** Noise glyph for a not-yet-revealed cell, or null when it blinks off. */
 export function noiseCell(x: number, y: number, tick: number) {
@@ -103,13 +117,10 @@ export function drawMonogram(
         ctx.fillText(n.char, cx, cy);
         continue;
       }
-      const c = lockedCell(lum[y * cols + x]);
+      const v = lum[y * cols + x];
+      const c = lockedCell(v);
       if (!c) continue;
-      if (opts.settled !== undefined && !isFresh(x, y, eased)) {
-        ctx.fillStyle = `rgba(226,232,240,${(opts.settled * (0.45 + lum[y * cols + x] * 0.55)).toFixed(3)})`;
-      } else {
-        ctx.fillStyle = c.color;
-      }
+      ctx.fillStyle = lockedColor(x, y, eased, v, opts.settled) ?? c.color;
       ctx.fillText(c.char, cx, cy);
     }
   }
