@@ -378,3 +378,8 @@ html[data-boot] .boot-overlay {
   -webkit-mask-composite: xor;
   mask-composite: exclude;
 }
+
+/* Glitch navigation: RGB split while the page wrapper is being sliced. */
+.glitching {
+  text-shadow: -2px 0 rgba(244, 114, 182, 0.85), 2px 0 rgba(125, 211, 252, 0.85);
+}

@@ -25,11 +25,13 @@ export default function Home() {
         <ConsoleBanner />
         <KonamiCode />
         <Navbar />
+        <div id="page-content" className="flex flex-1 flex-col">
         <Hero />
         <Experience />
         <Projects />
         <ContactMe />
         <Footer />
+        </div>
         <ScrollButton />
       </div>
     </MotionConfig>

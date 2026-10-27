@@ -1,5 +1,6 @@
 "use client";
 
+import { glitchJump } from "@/src/lib/glitchJump";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import GlyphField from "./GlyphField";
@@ -106,11 +107,7 @@ const Hero = () => {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
           className="flex justify-center gap-4">
           <button
-            onClick={() =>
-              document
-                .getElementById("projects")
-                ?.scrollIntoView({ behavior: "smooth" })
-            }
+            onClick={() => glitchJump("projects")}
             className="rounded-lg bg-white px-6 py-3 font-medium text-zinc-950 shadow-sm ring-2 ring-transparent transition-[color,box-shadow,background-color] hover:bg-transparent hover:text-white hover:ring-white">
             View Projects
           </button>

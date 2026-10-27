@@ -1,5 +1,6 @@
 "use client";
 
+import { glitchJump } from "@/src/lib/glitchJump";
 import { useEffect, useState, type MouseEvent } from "react";
 import { motion } from "framer-motion";
 import { useScramble } from "@/src/lib/useScramble";
@@ -53,7 +54,7 @@ const NavbarContent = ({ variant = "default" }: Props) => {
   const scramble = useScramble();
 
   // Real anchors, so the items are right-clickable and deep-linkable. The
-  // handler only takes over to keep the existing smooth scroll.
+  // handler only takes over to play the glitch jump.
   const goToSection = (
     event: MouseEvent<HTMLAnchorElement>,
     sectionId: string,
@@ -61,7 +62,7 @@ const NavbarContent = ({ variant = "default" }: Props) => {
     const element = document.getElementById(sectionId);
     if (!element) return;
     event.preventDefault();
-    element.scrollIntoView({ behavior: "smooth" });
+    glitchJump(sectionId);
     setActiveSection(sectionId);
   };
 
