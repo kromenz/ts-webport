@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { createGlitchJumper } from "./glitchJump";
 
+const flush = () => new Promise<void>((r) => setTimeout(r));
+
 function setup(reduced = false, missing = false) {
   const els: Record<string, { scrollIntoView: ReturnType<typeof vi.fn> }> = {
     a: { scrollIntoView: vi.fn() },
@@ -8,11 +10,13 @@ function setup(reduced = false, missing = false) {
   };
   let mid: () => void = () => {};
   let done: () => void = () => {};
+  let fail: (e: unknown) => void = () => {};
   const run = vi.fn(
     (_root: HTMLElement, onMid: () => void) =>
-      new Promise<void>((res) => {
+      new Promise<void>((res, rej) => {
         mid = onMid;
         done = res;
+        fail = rej;
       }),
   );
   const jump = createGlitchJumper({
@@ -22,7 +26,14 @@ function setup(reduced = false, missing = false) {
     run,
     reduced: () => reduced,
   });
-  return { els, run, jump, mid: () => mid(), done: () => done() };
+  return {
+    els,
+    run,
+    jump,
+    mid: () => mid(),
+    done: () => done(),
+    fail: (e: unknown) => fail(e),
+  };
 }
 
 describe("createGlitchJumper", () => {
@@ -33,7 +44,7 @@ describe("createGlitchJumper", () => {
     expect(s.run).toHaveBeenCalledTimes(1);
     s.mid();
     s.done();
-    await Promise.resolve();
+    await flush();
     expect(s.els.a.scrollIntoView).not.toHaveBeenCalled();
     expect(s.els.b.scrollIntoView).toHaveBeenCalledTimes(1);
     expect(s.els.b.scrollIntoView).toHaveBeenCalledWith({ behavior: "instant" });
@@ -44,8 +55,7 @@ describe("createGlitchJumper", () => {
     s.jump("a");
     s.mid();
     s.done();
-    await Promise.resolve();
-    await Promise.resolve();
+    await flush();
     s.jump("b");
     expect(s.run).toHaveBeenCalledTimes(2);
   });
@@ -61,5 +71,55 @@ describe("createGlitchJumper", () => {
     s.jump("a");
     expect(s.run).not.toHaveBeenCalled();
     expect(s.els.a.scrollIntoView).toHaveBeenCalledWith({ behavior: "instant" });
+  });
+
+  it("lands a call made after mid right after the run ends", async () => {
+    const s = setup();
+    s.jump("a");
+    s.mid();
+    expect(s.els.a.scrollIntoView).toHaveBeenCalledTimes(1);
+    s.jump("b");
+    expect(s.els.b.scrollIntoView).not.toHaveBeenCalled();
+    s.done();
+    await flush();
+    expect(s.run).toHaveBeenCalledTimes(1);
+    expect(s.els.b.scrollIntoView).toHaveBeenCalledTimes(1);
+    expect(s.els.b.scrollIntoView).toHaveBeenCalledWith({ behavior: "instant" });
+  });
+
+  it("does not re-land the same id when called again after mid", async () => {
+    const s = setup();
+    s.jump("a");
+    s.mid();
+    s.jump("a");
+    s.done();
+    await flush();
+    expect(s.els.a.scrollIntoView).toHaveBeenCalledTimes(1);
+  });
+
+  it("stays usable and lands the target when run throws synchronously", async () => {
+    const s = setup();
+    s.run.mockImplementationOnce(() => {
+      throw new Error("boom");
+    });
+    s.jump("a");
+    await flush();
+    expect(s.els.a.scrollIntoView).toHaveBeenCalledTimes(1);
+    s.jump("b");
+    expect(s.run).toHaveBeenCalledTimes(2);
+    s.mid();
+    s.done();
+    await flush();
+    expect(s.els.b.scrollIntoView).toHaveBeenCalledTimes(1);
+  });
+
+  it("stays usable when run rejects", async () => {
+    const s = setup();
+    s.jump("a");
+    s.fail(new Error("boom"));
+    await flush();
+    expect(s.els.a.scrollIntoView).toHaveBeenCalledTimes(1);
+    s.jump("b");
+    expect(s.run).toHaveBeenCalledTimes(2);
   });
 });
