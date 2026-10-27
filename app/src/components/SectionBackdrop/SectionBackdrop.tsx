@@ -2,9 +2,8 @@
 
 import { useEffect, useRef } from "react";
 
+import { STACK_TOKENS } from "@/src/lib/ascii/tokens";
 import { siteReducedMotion } from "@/src/lib/motion";
-
-const CHARS = "01{}[]()<>/\\|;:=+-*#$&%_abcdefghijklmnopqrstuvwxyz";
 
 /** Fraction of the width, each side, that the texture is confined to. */
 const BAND = 0.32;
@@ -12,6 +11,8 @@ const BAND = 0.32;
 const STEP = 18;
 /** Falling glyphs per column, each with its own speed and start height. */
 const DROPS_PER_COLUMN = 2;
+/** Vertical advance between the characters of a stacked token. */
+const LINE_H = 13;
 /** Peak glyph opacity, at the outer edge of a band. */
 const GLYPH_ALPHA = 0.34;
 /** Per-frame wipe. Lower leaves a longer trail behind each glyph. */
@@ -33,8 +34,12 @@ type Glyph = {
   y: number;
   speed: number;
   alpha: number;
-  ch: string;
+  /** A whole stack token, drawn top to bottom so it reads as a word. */
+  tok: string;
 };
+
+const pickToken = () =>
+  STACK_TOKENS[Math.floor(Math.random() * STACK_TOKENS.length)];
 
 type Node = {
   x: number;
@@ -46,8 +51,6 @@ type Node = {
   /** Which band the node belongs to, so edges never jump the card. */
   band: 0 | 1;
 };
-
-const pick = () => CHARS[Math.floor(Math.random() * CHARS.length)];
 
 /** The grid is the constant; this is the layer that changes per section. */
 export type BackdropVariant = "glyph" | "graph";
@@ -110,12 +113,16 @@ const SectionBackdrop = ({ variant = "glyph", className }: Props) => {
       ctx.font = '12px "Fira Code", ui-monospace, monospace';
       for (const glyph of glyphs) {
         ctx.fillStyle = `rgba(52, 211, 153, ${glyph.alpha.toFixed(3)})`;
-        ctx.fillText(glyph.ch, glyph.x, glyph.y);
+        const tok = glyph.tok;
+        for (let i = 0; i < tok.length; i++) {
+          ctx.fillText(tok[i], glyph.x, glyph.y + i * LINE_H);
+        }
         if (!advance) continue;
         glyph.y += glyph.speed;
-        if (Math.random() < 0.03) glyph.ch = pick();
         if (glyph.y > height + 12) {
-          glyph.y = -12;
+          // A fresh token each lap, entering from above the band.
+          glyph.tok = pickToken();
+          glyph.y = -12 - glyph.tok.length * LINE_H;
           glyph.speed = 0.3 + Math.random() * 0.7;
         }
       }
@@ -213,10 +220,12 @@ const SectionBackdrop = ({ variant = "glyph", className }: Props) => {
           for (let d = 0; d < DROPS_PER_COLUMN; d++) {
             glyphs.push({
               x,
-              y: Math.random() * height,
+              // Each drop owns its own slice of the height, so two tokens in
+              // one column start apart instead of on top of each other.
+              y: ((d + Math.random()) / DROPS_PER_COLUMN) * height,
               speed: 0.3 + Math.random() * 0.7,
               alpha,
-              ch: pick(),
+              tok: pickToken(),
             });
           }
         };

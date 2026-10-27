@@ -1,10 +1,15 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 "use client";
 
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FilePdf, X, ArrowSquareOut } from "@phosphor-icons/react";
-import { WORK_EXPERIENCE } from "@/src/data/data";
+import { PROFILE, WORK_EXPERIENCE } from "@/src/data/data";
+import CommitGraph from "./CommitGraph";
+import NpmInstall from "./NpmInstall";
+import { buildCommits } from "@/src/lib/gitGraph";
+import { experienceOutput } from "@/src/lib/sectionPrompts";
+import { useScramble } from "@/src/lib/useScramble";
 import SectionDivider from "@/src/components/SectionDivider/SectionDivider";
 import SectionBackdrop from "@/src/components/SectionBackdrop/SectionBackdrop";
 
@@ -19,19 +24,32 @@ type Experience = {
   title: string;
   position: string;
   date: string;
+  branch?: boolean;
   responsibilities: Responsibility[];
   skills?: string[];
   attachments?: Attachment[];
 };
 
 const EXPERIENCES = WORK_EXPERIENCE as Experience[];
+const COMMITS = buildCommits(EXPERIENCES);
 
 const Experience = () => {
   const [activeIndex, setActiveIndex] = useState(EXPERIENCES.length - 1);
   const [openAttachment, setOpenAttachment] = useState<Attachment | null>(null);
   const active = EXPERIENCES[activeIndex];
 
+  const scramble = useScramble();
+  const interacted = useRef(false);
+  const scrambleRef = useCallback(
+    (el: HTMLElement | null) => {
+      if (el && interacted.current) scramble(el);
+    },
+    [scramble],
+  );
+  const activeHash = COMMITS.find((c) => c.index === activeIndex)?.hash ?? "";
+
   const selectExperience = (index: number) => {
+    interacted.current = true;
     setActiveIndex(index);
     setOpenAttachment(null);
   };
@@ -41,7 +59,12 @@ const Experience = () => {
       id="experience"
       className="relative isolate overflow-hidden pt-24 pb-40 md:pb-48">
       <SectionBackdrop />
-      <SectionDivider command="cd ../work_experience" />
+      <SectionDivider
+        label="Experience"
+        path="~/experience"
+        command="git log --oneline | wc -l"
+        output={experienceOutput(WORK_EXPERIENCE, PROFILE.since)}
+      />
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto rounded-2xl border border-white/10 bg-[#17171e]/92 overflow-hidden shadow-xl shadow-black/20">
           {/* Window chrome */}
@@ -57,51 +80,12 @@ const Experience = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] md:h-[700px]">
-            <div className="flex md:flex-col overflow-x-auto md:overflow-x-visible md:overflow-y-auto border-b md:border-b-0 md:border-r border-white/10 scrollbar-custom">
-              {EXPERIENCES.map((exp, i) => {
-                const isActive = i === activeIndex;
-                return (
-                  <button
-                    key={i}
-                    onClick={() => selectExperience(i)}
-                    className={`relative shrink-0 md:shrink text-left px-4 py-3 transition-colors font-mono text-sm whitespace-nowrap md:whitespace-normal ${
-                      isActive
-                        ? "bg-white/4 text-foreground"
-                        : "text-foreground/55 hover:text-foreground hover:bg-white/2"
-                    }`}>
-                    {isActive && (
-                      <motion.span
-                        layoutId="experienceTab"
-                        className="absolute left-0 top-0 bottom-0 w-0.5 bg-green-primary md:block hidden"
-                        transition={{
-                          type: "spring",
-                          stiffness: 500,
-                          damping: 35,
-                        }}
-                      />
-                    )}
-                    {isActive && (
-                      <motion.span
-                        layoutId="experienceTabMobile"
-                        className="absolute left-0 right-0 bottom-0 h-0.5 bg-green-primary md:hidden"
-                        transition={{
-                          type: "spring",
-                          stiffness: 500,
-                          damping: 35,
-                        }}
-                      />
-                    )}
-                    <div className="flex items-center gap-2">
-                      <span className="text-green-primary/70">{">"}</span>
-                      <span className="font-medium">{exp.title}</span>
-                    </div>
-                    <span className="block text-xs text-foreground/45 md:ml-4 ml-5">
-                      {exp.position}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+            <CommitGraph
+              entries={EXPERIENCES}
+              commits={COMMITS}
+              activeIndex={activeIndex}
+              onSelect={selectExperience}
+            />
 
             <div className="relative md:min-h-0">
               <AnimatePresence mode="wait">
@@ -161,12 +145,20 @@ const Experience = () => {
                     exit={{ opacity: 0, y: -8 }}
                     transition={{ duration: 0.2, ease: "easeOut" }}
                     className="p-6 md:p-8 md:absolute md:inset-0 md:overflow-y-auto scrollbar-custom">
+                    <p className="font-mono text-xs mb-3 text-foreground/45">
+                      <span className="text-green-primary/70">$</span> git show{" "}
+                      <span style={{ color: "#e5c07b" }}>{activeHash}</span>
+                    </p>
                     <div className="flex flex-col md:flex-row md:items-baseline md:justify-between gap-1 mb-1">
                       <h3 className="text-xl font-semibold tracking-tight text-foreground">
-                        {active.title}
+                        <span key={`t-${activeIndex}`} ref={scrambleRef}>
+                          {active.title}
+                        </span>
                         <span className="text-foreground/55 font-normal">
-                          {" "}
-                          / {active.position}
+                          {" / "}
+                          <span key={`p-${activeIndex}`} ref={scrambleRef}>
+                            {active.position}
+                          </span>
                         </span>
                       </h3>
                       <span className="text-xs font-mono text-green-primary/90 shrink-0">
@@ -225,21 +217,7 @@ const Experience = () => {
                         <p className="text-xs uppercase tracking-wider text-foreground/45 font-mono mb-3">
                           // skills gained
                         </p>
-                        <div className="flex flex-wrap gap-2">
-                          {active.skills.map((skill, skillIndex) => (
-                            <motion.span
-                              key={skill}
-                              initial={{ opacity: 0, y: 4 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{
-                                duration: 0.2,
-                                delay: 0.05 * skillIndex,
-                              }}
-                              className="px-3 py-1 text-xs rounded-full border border-white/10 bg-white/3 text-green-primary/90 hover:border-green-primary/40 hover:bg-green-primary/10 transition-colors cursor-default font-mono">
-                              {skill}
-                            </motion.span>
-                          ))}
-                        </div>
+                        <NpmInstall key={activeIndex} skills={active.skills} />
                       </div>
                     )}
                   </motion.div>

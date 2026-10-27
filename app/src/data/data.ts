@@ -1,3 +1,11 @@
+export const PROFILE = {
+  name: "Rafael André",
+  role: "Software Engineer @ RHY Consulting",
+  about:
+    "Software engineer. Builds platforms end to end: schema, auth, payments, deploy pipelines. Currently at RHY Consulting, through Alongside.",
+  since: 2022,
+};
+
 export type Project = {
   title: string;
   imageUrl?: string;
@@ -32,6 +40,27 @@ export const PROJECTS: Project[] = [
     ],
   },
   {
+    title: "Agentic Finance Readiness — AI-Agent Evidence Platform for Finance",
+    description:
+      "Measuring how far an AI agent gets inside real finance platforms, and building the system that proves it. A research and evidence platform that answers one question for a payments client: can an AI agent actually run accounts receivable and accounts payable work on its own? Eleven finance platforms — ERPs, SME accounting tools, AP and AR products — are each attempted through five different routes in (the product's own AI, a browser agent, connectors and MCP, a desktop agent, and the API), across order-to-cash and procure-to-pay. Every attempt is recorded as a run with its evidence. Built solo as sole engineer and tester: the test harness, the runs, and the dashboard the client reads results from — 1,174 commits, 448 recorded runs and 2,171 step results, and ~1,600 evidence artifacts.",
+    type: "Work",
+    tech: [
+      "Next.js 16 (App Router)",
+      "React 19",
+      "TypeScript",
+      "Drizzle ORM",
+      "PostgreSQL (Neon)",
+      "Neon Auth",
+      "Zod",
+      "Tailwind 4",
+      "Vitest",
+      "Playwright",
+      "Docker",
+      "Vercel",
+      "Node 24",
+    ],
+  },
+  {
     title: "The Cusp — Website Creation & Hosting Platform",
     description:
       "Turning a payment into a live, deployed website with zero manual steps. The Cusp is a website creation and hosting platform. A customer signs up, picks a plan, and pays; everything after that is automatic. The platform provisions their GitHub repository, creates their Vercel project, publishes a branded \"under construction\" placeholder, and streams every step of the build back to them in real time until the site is live. I owned the backbone of that flow — schema design, authentication, payment integration, the customer dashboard, and the provisioning and deploy pipeline — along with the hosting lifecycle that suspends and restores sites as subscriptions change.",
@@ -48,6 +77,20 @@ export const PROJECTS: Project[] = [
       "Webhooks",
     ],
     liveUrl: "https://thecusp.ai",
+  },
+  {
+    title: "Worldover — Compliance Document Engine",
+    description:
+      "The reporting and document system of a B2B compliance platform — a backend-heavy area with tangled business logic, regulatory requirements, and customer-specific workflows around formulations, dossiers, and product compliance. I took full ownership of it: customer-specific reports, dossiers, declarations, technical sheets, ingredient lists, and compliance documents, exported as DOCX, Excel and PDF. Underneath sits a generic, configurable document engine — dynamic tables, metadata, headers/footers, logos, pagination, conditional fields, formatting, totals, and generation parameters — that turns ad-hoc client requests into reusable building blocks. Relationships between documents, products, raw materials, formulations, batches, and lab tests are modelled and queried in a graph database.",
+    type: "Work",
+    tech: [
+      "TypeScript",
+      "Node.js",
+      "tRPC",
+      "Next.js",
+      "AWS Neptune",
+      "Gremlin",
+    ],
   },
   {
     title: "XML_Parsing - RPC_Server",
@@ -198,6 +241,7 @@ export const WORK_EXPERIENCE = [
     title: "BorgWarner",
     position: "Summer Internship",
     date: "Jul 2024 - Aug 2024",
+    branch: true,
     responsibilities: [
       "I began my internship at BorgWarner focusing on integrating Jasper with Python to generate various reports for the factory's production lines. My key responsibilities include:",
       [
@@ -290,7 +334,19 @@ export const WORK_EXPERIENCE = [
     position: "Software Engineer",
     date: "2026 - Present",
     responsibilities: [
-      "Software engineer at Alongside, delivering client platforms through RHY Consulting. Two projects to date:",
+      "Software engineer at RHY Consulting, through Alongside. Three projects to date:",
+
+      "Agentic Finance Readiness — a fintech advisory client via RHY, Sep 2026 to Oct 2026. Measuring how far an AI agent gets inside real finance platforms, and building the system that proves it. A research and evidence platform that answers one question for a payments client: can an AI agent actually run accounts receivable and accounts payable work on its own? Eleven finance platforms — ERPs, SME accounting tools, AP and AR products — are each attempted through five different routes in (the product's own AI, a browser agent, connectors and MCP, a desktop agent, and the API), across order-to-cash and procure-to-pay. Every attempt is recorded as a run with its evidence. I built the whole thing solo as sole engineer and tester: the test harness, the runs, and the dashboard the client reads results from — 1,174 commits, 448 recorded runs and 2,171 step results, and ~1,600 evidence artifacts.",
+
+      [
+        "Evidence Model: designed the evidence model that holds the project together. Results live as validated files in the repo, every build imports and re-validates them into Postgres, and the loader refuses to deploy an incomplete record — a mark with no run behind it, a route missing its result, a blocked step with no stated reason. Bad data fails the build rather than quietly reaching the client.",
+        "Client Dashboard: built the client-facing dashboard — Next.js 16 on Vercel over Neon Postgres, with a per-platform step grid, route verdicts, findings and friction views, spreadsheet export, and streamed screenshot and video evidence downloadable per run.",
+        "Authentication & Access Control: implemented authentication and access control for an external client audience — Neon Auth behind a private email allowlist, a rate-limited sign-in gate with per-address lockout, a last-admin lock that cannot be bypassed from the UI, an activity log, and a scheduled prune secured by a cron secret.",
+        "Testing Programme: ran the testing programme itself — 448 runs and 2,171 step results across eleven platforms, driving agents through each one, capturing evidence, and writing up what stopped them and why.",
+        "Reproducible Automation: built the automation around it — a containerised harness (Docker, devcontainer, Playwright/Chromium) so every run is reproducible, per-platform API probes, and screen-capture tooling that trims and compresses run recordings.",
+        "Evidence or Nothing: enforced an evidence-or-nothing standard in code, not convention. An untried step stays empty rather than being marked a failure, unverified claims are tagged by source, prose quality is checked by script in CI, and roughly ninety test files gate every change.",
+      ],
+
 
       "Access OS — Access Holdings, Jun 2026 to present. Sole engineer on an internal deal-sourcing platform for a private equity firm, built solo. It replaces four legacy applications with one system. Underneath sit two objective databases — Insights, normalized facts tied to geography, and Market Map, companies, locations and people. Above them sits a Research layer where each investment thesis declares its own Value and Edge, owns its scoring lenses, and produces Want-to-Own lists and POVs for the investment committee.",
 
@@ -331,6 +387,14 @@ export const WORK_EXPERIENCE = [
       "Webhooks",
       "jose",
       "bcrypt",
+      "Drizzle ORM",
+      "Zod",
+      "Neon Auth",
+      "MCP (Model Context Protocol)",
+      "Playwright",
+      "Vitest",
+      "Docker",
+      "Node.js 24",
     ],
   },
 ];
