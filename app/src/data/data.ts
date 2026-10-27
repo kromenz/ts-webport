@@ -290,7 +290,18 @@ export const WORK_EXPERIENCE = [
     position: "Software Engineer",
     date: "2026 - Present",
     responsibilities: [
-      "Software engineer at Alongside, delivering client platforms through RHY Consulting. Two projects to date:",
+      "Software engineer at Alongside, delivering client platforms through RHY Consulting. Three projects to date:",
+
+      "Agentic Finance Readiness — a payments consultancy via RHY, Sep 2026 to present. The client had a deck ranking 14+ financial platforms (ERPs, SME accounting, AP, AR) on how ready they were for AI agents, but every rating came from vendor documentation. What was missing was proof: how far an AI agent actually gets through Order-to-Cash and Procure-to-Pay on each platform, and whether it can work unsupervised. I was lead engineer on a three-person team and sole author of the codebase. An agent attempts each step of the finance process through five different access paths, every attempt is recorded as a run with screenshots, recordings and the exact point where it stopped, and a private dashboard shows the client, step by step and path by path, what the agent achieved, what failed and what is still untested. I built the repository and data contract, the validation schemas, the database and import pipeline, the full dashboard, the agent devcontainer and the browser-automation scripts, and ran tests across four platforms — 71 runs and 330 step results in roughly ten days.",
+
+      [
+        "Evidence or Nothing: the coverage grid is built only from recorded runs. An empty cell means \"not tested\", never \"failed\", and ratings we tested ourselves render differently from ones lifted from documentation. The hard part was refusing to fill gaps with plausible guesses — every unproven claim carries a tag ([UNVERIFIED], [INFERENCE], [STALE?]).",
+        "Git as the Database: researchers edit JSON and Markdown, one folder per platform, and a Vercel prebuild validates everything with Zod, runs migrations and imports it into Neon Postgres. The test suite loads all 17 real platform folders, so a malformed file anywhere breaks the build before it reaches the client.",
+        "One Ladder, Five Paths: the access paths — native product AI, browser agent, desktop agent, MCP and API — each have a fixed number, and the schema enforces the number-to-path mapping on every record. The client's test-priority order lives separately, so re-prioritising never renumbers historical data.",
+        "Agents on Real Accounts, with Guardrails: tests run on live client accounts under explicit rules — sandbox first, data labelled as test data, no real payments without prior agreement. When a vendor's terms of service forbid a path, that is recorded as blocked and not worked around. The findings were real: in one ERP an agent approved its own purchase order, and in another it recorded a payment against an invoice that was not yet approved.",
+        "Secured Access & Evidence: Neon Auth with an email allowlist, a password gate with lockout on failed attempts, evidence served only through authenticated routes with per-run zip export, an activity log, and a nightly cron that prunes it.",
+      ],
+
 
       "Access OS — Access Holdings, Jun 2026 to present. Sole engineer on an internal deal-sourcing platform for a private equity firm, built solo. It replaces four legacy applications with one system. Underneath sit two objective databases — Insights, normalized facts tied to geography, and Market Map, companies, locations and people. Above them sits a Research layer where each investment thesis declares its own Value and Edge, owns its scoring lenses, and produces Want-to-Own lists and POVs for the investment committee.",
 
@@ -331,6 +342,13 @@ export const WORK_EXPERIENCE = [
       "Webhooks",
       "jose",
       "bcrypt",
+      "Drizzle ORM",
+      "Zod",
+      "Neon Auth",
+      "MCP (Model Context Protocol)",
+      "Playwright",
+      "Vitest",
+      "Docker",
     ],
   },
 ];
