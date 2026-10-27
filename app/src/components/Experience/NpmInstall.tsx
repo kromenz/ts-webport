@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { BAR_CELLS, installFrame } from "@/src/lib/npmInstall";
 import { useSiteReducedMotion } from "@/src/lib/motion";
 
@@ -12,17 +12,21 @@ const TICK_MS = 12;
  * active experience: a new key mounts a fresh instance, and unmount cancels
  * the interval, so fast tab switching can never stack output.
  *
- * Initial state is the final output, so SSR equals the first client render
- * and reduced motion needs no extra work.
+ * Initial render is the final output, so SSR equals the first client render
+ * and reduced motion shows it too.
  */
 const NpmInstall = ({ skills }: { skills: string[] }) => {
   const reduced = useSiteReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
-  const [lines, setLines] = useState<string[]>(() =>
-    installFrame(skills, skills.length, 0),
-  );
+  // Run state is null until the effect starts a run, so the first render (and
+  // SSR) shows the final output. Reduced motion always shows it too.
+  const [run, setRun] = useState<{ pkg: number; tick: number } | null>(null);
+  const lines =
+    reduced || run === null
+      ? installFrame(skills, skills.length, 0)
+      : installFrame(skills, run.pkg, run.tick);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const root = rootRef.current;
     if (reduced || !root) return;
 
@@ -42,17 +46,15 @@ const NpmInstall = ({ skills }: { skills: string[] }) => {
           pkg += 1;
           tick = 0;
         }
-        setLines(installFrame(skills, pkg, tick));
+        setRun({ pkg, tick });
         if (pkg >= skills.length) stop();
       }, TICK_MS);
     };
 
-    // Rewind to an empty run before the first paint; the bar starts once the
+    // Layout effect: rewinds before paint. The bar itself starts once the
     // block scrolls into view.
-    let cancelled = false;
-    queueMicrotask(() => {
-      if (!cancelled) setLines(installFrame(skills, 0, 0));
-    });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setRun({ pkg: 0, tick: 0 });
 
     const io = new IntersectionObserver(
       (entries) => {
@@ -66,7 +68,6 @@ const NpmInstall = ({ skills }: { skills: string[] }) => {
     io.observe(root);
 
     return () => {
-      cancelled = true;
       io.disconnect();
       stop();
     };
